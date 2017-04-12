@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import com.platform.utils.Constant;
 import com.platform.utils.MD5Utils;
@@ -24,7 +23,7 @@ import com.weeds.domain.PlatformUser;
 import com.weeds.service.UserService;
 
 @RestController
-public class UserController extends MultiActionController {
+public class UserController {
 	//主要的东西还是在配置xml文件里
 	
 	@Autowired
