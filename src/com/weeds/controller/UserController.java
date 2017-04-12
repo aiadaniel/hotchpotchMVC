@@ -2,13 +2,19 @@ package com.weeds.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -60,5 +66,21 @@ public class UserController extends MultiActionController {
 //	public User getUser() {
 //		return new User(new Random().nextLong(),"haha","heihei");
 //	}
-
+	
+	@PostMapping("/userlist")
+	@ResponseBody
+	public Map<String,Object> getUsers() {
+		List<PlatformUser> users = new ArrayList<PlatformUser>();
+		PlatformUser user1 = new PlatformUser();
+		user1.setId(new Random().nextInt());
+		user1.setNickname("Queen");
+		users.add(user1);
+		PlatformUser user2 = new PlatformUser();
+		user2.setId(new Random().nextInt());
+		user2.setNickname("Jake");
+		users.add(user1);
+		Map<String, Object> maps = new HashMap<String, Object>();
+		maps.put("users", users);
+		return maps;
+	}
 }
