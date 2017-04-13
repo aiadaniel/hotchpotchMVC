@@ -2,6 +2,7 @@ package com.weeds.service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,14 @@ import com.weeds.dao.UserDao;
 import com.weeds.domain.BaseBean;
 import com.weeds.domain.PlatformUser;
 
+/*
+ * NOTE: 这个地方的 @Transactional注解在上个版本还能正常运行，这次修改加入了其他的Service如BoardService等之后，
+ * 发现竟然不工作了，现象是UserController下的userService无法正确的注入，提示类型不对  
+ * (org.springframework.beans.factory.BeanNotOfRequiredTypeException: 
+ * Bean named 'userService' must be of type [***], but was actually of type [com.sun.proxy.$Proxy*])。
+ * 把@Transactional移到UserController时就能工作。 
+ * 目前初步判断是跟hibernate的事务代理有一些冲突吧，后续深入了解下。
+ */
 @Transactional
 @Service
 public class UserService<T extends BaseBean> implements IService<T> {
@@ -70,6 +79,39 @@ public class UserService<T extends BaseBean> implements IService<T> {
 		}
 		
 		return ErrCodeBase.ERR_FAIL;
+	}
+
+	@Override
+	public T find(Class<T> clazz, int id) {
+		return null;
+	}
+
+	@Override
+	public int create(T basebean) {
+		return 0;
+	}
+
+	@Override
+	public void save(T basebean) {
+	}
+
+	@Override
+	public void delete(T basebean) {
+	}
+
+	@Override
+	public List<T> list(String sql) {
+		return null;
+	}
+
+	@Override
+	public int getTotalCount(String sql, Object... params) {
+		return 0;
+	}
+
+	@Override
+	public List<T> list(String sql, int first, int max, Object... params) {
+		return null;
 	}
 
 }

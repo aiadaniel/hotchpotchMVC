@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +24,11 @@ import com.platform.utils.MD5Utils;
 import com.weeds.domain.PlatformUser;
 import com.weeds.service.UserService;
 
+//@Transactional
 @RestController
 public class UserController {
+	
+	final Logger logger = LoggerFactory.getLogger(UserController.class);
 	//主要的东西还是在配置xml文件里
 	
 	@Autowired
@@ -31,7 +36,8 @@ public class UserController {
 	
 	@RequestMapping(path = "/user/regist",method = RequestMethod.POST)
 	public String regist() {
-		System.out.println("== i got regist!");
+		//System.out.println("== i got regist!");
+		logger.info("== i got regist!");
 		PlatformUser user = new PlatformUser();
 		user.setNickname("test" + Math.abs( new Random().nextInt()));
 		user.setDateCreated(new Date());
@@ -55,7 +61,8 @@ public class UserController {
 	@RequestMapping(path="/user/login/{nickname}/{password}",method=RequestMethod.POST/*,params="myparam=1"*/)
 	public String login(@PathVariable String nickname,@PathVariable String password) {//方式1
 		
-		System.out.println("== i got login " + nickname + "  " + password);
+		//System.out.println("== i got login " + nickname + "  " + password);
+		logger.debug("== i got login {}  {}", nickname,password);
 		return "en " + nickname + " !";
 	}
 	
