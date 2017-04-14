@@ -14,6 +14,12 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
 
+	<!-- Swagger资源重定向(仅作为后台使用不提供静态资源) -->
+	<mvc:resources location="classpath:/META-INF/resources/"
+		mapping="swagger-ui.html" />
+	<mvc:resources location="classpath:/META-INF/resources/webjars/"
+		mapping="/webjars/**" />
+
 	<!-- ViewResolver -->
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -30,12 +36,13 @@
 	<!-- spring 的自动注解，如果配置扫描包component-scan，其实可以不用这项 -->
 	<context:annotation-config />
 
-	<aop:aspectj-autoproxy proxy-target-class="true"/>
-
 	<!-- mvc使用注解 -->
-	<mvc:annotation-driven></mvc:annotation-driven>
-	<context:component-scan base-package="com.weeds">
-	</context:component-scan>
+	<mvc:annotation-driven />
+
+	<context:component-scan base-package="com.weeds" />
+	<context:component-scan base-package="com.platform.utils" />
+
+	<aop:aspectj-autoproxy proxy-target-class="true" />
 
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
@@ -86,20 +93,9 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-<!-- 	<bean id="hibernateTransactionAttributeSource"
-		class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource">
-		<property name="properties">
-			<props>
-				<prop key="*">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean> -->
-
-	<aop:config>
-		<aop:pointcut id="bussinessService"
-			expression="execution(* com.weeds.service.*.*(..))" />
-		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
-	</aop:config>
+	<!-- <bean id="hibernateTransactionAttributeSource" class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource"> 
+		<property name="properties"> <props> <prop key="*">PROPAGATION_REQUIRED</prop> 
+		</props> </property> </bean> -->
 
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
@@ -110,5 +106,12 @@
 			<tx:method name="delete*" propagation="REQUIRED" />
 		</tx:attributes>
 	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="bussinessService" expression="execution(* com.weeds.*.*(..))" />
+		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
+	</aop:config>
+
+
 
 </beans>

@@ -1,9 +1,12 @@
 package com.weeds.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -12,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.weeds.domain.Board;
 import com.weeds.service.BoardService;
 
-@Transactional
+
 @RestController
+@Api(value="板块api")
 public class BoardController {
 
 	//主要包含创建删除板块、获取板块列表
@@ -30,7 +34,8 @@ public class BoardController {
 	}
 	
 	@PostMapping("/forum/board/add/{name}")
-	public String addBoard(@PathVariable String name) {
+	@ApiOperation(value="添加板块",httpMethod="post",response=String.class,notes="该接口用于添加板块")
+	public String addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name) {
 		Board board = new Board();
 		board.setName(name);
 		boardService.create(board);

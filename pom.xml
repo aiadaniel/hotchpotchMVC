@@ -61,6 +61,8 @@
 		<hibernate.version>4.3.5.Final</hibernate.version>
 		<spring.version>4.3.7.RELEASE</spring.version>
 		<struts2.version>2.5.10.1</struts2.version>
+		<swagger.version>2.6.0</swagger.version>
+		<jackson.version>2.7.4</jackson.version>
 	</properties>
 
 	<dependencies>
@@ -114,17 +116,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.7.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.7.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.7.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>
@@ -159,12 +161,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.7.2</version>
+			<version>1.7.21</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.2</version>
+			<version>1.7.21</version>
 		</dependency>
 		<!-- <dependency> <groupId>log4j</groupId> <artifactId>log4j</artifactId> 
 			<version>1.2.14</version> </dependency> -->
@@ -173,6 +175,17 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.7.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger.version}</version>
 		</dependency>
 	</dependencies>
 </project>
