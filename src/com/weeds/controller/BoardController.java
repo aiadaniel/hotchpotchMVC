@@ -33,6 +33,12 @@ public class BoardController {
 		return boardService.list(hql);
 	}
 	
+	/*
+	 * When test this api,I got this error:
+	 * org.springframework.dao.InvalidDataAccessApiUsageException: Write operations are not allowed in read-only mode (FlushMode.MANUAL): 
+	 * Turn your Session into FlushMode.COMMIT/AUTO or remove 'readOnly' marker from transaction definition.
+	 * 
+	 */
 	@PostMapping("/forum/board/add/{name}")
 	@ApiOperation(value="添加板块",httpMethod="post",response=String.class,notes="该接口用于添加板块")
 	public String addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name) {
