@@ -3,6 +3,9 @@ package com.weeds.domain;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -13,6 +16,10 @@ import javax.persistence.Table;
 //»ØÌû
 public class Reply extends BaseBean {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
+	
 	@ManyToOne
 	@JoinColumn(name = "thread_id")
 	private Thread thread;
@@ -24,17 +31,25 @@ public class Reply extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")
-	private Person author;
+	private PlatformUser author;
 
 	private int floor;
 
 	private String ipCreated;
 
-	public Person getAuthor() {
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public PlatformUser getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(Person author) {
+	public void setAuthor(PlatformUser author) {
 		this.author = author;
 	}
 

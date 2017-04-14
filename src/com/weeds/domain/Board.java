@@ -5,6 +5,9 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -16,7 +19,7 @@ import javax.persistence.Table;
 //板块
 public class Board extends BaseBean {
 	
-	/*
+	/*例子，现在已经改了
 	CREATE TABLE `tb_board` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  `dateCreated` datetime DEFAULT NULL,
@@ -56,6 +59,10 @@ public class Board extends BaseBean {
 	| last_thread_id | int(11)      | YES  | MUL | NULL    |                |
 	+----------------+--------------+------+-----+---------+----------------+
 	 */
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
 
 	@ManyToOne
 	@JoinColumn(name = "category_id")
@@ -78,8 +85,19 @@ public class Board extends BaseBean {
 	private Thread lastThread;
 
 	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "board_administrator", joinColumns = { @JoinColumn(name = "board_id") }, inverseJoinColumns = { @JoinColumn(name = "person_id") })
-	private Set<Person> administrators = new HashSet<Person>();
+	@JoinTable(name = "board_administrator", 
+				joinColumns = { @JoinColumn(name = "board_id") }, 
+				inverseJoinColumns = { @JoinColumn(name = "platformuser_id") })
+	private Set<PlatformUser> administrators = new HashSet<PlatformUser>();
+	
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public Category getCategory() {
 		return category;
@@ -95,14 +113,6 @@ public class Board extends BaseBean {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Set<Person> getAdministrators() {
-		return administrators;
-	}
-
-	public void setAdministrators(Set<Person> administrators) {
-		this.administrators = administrators;
 	}
 
 	public String getDescription() {
@@ -145,4 +155,11 @@ public class Board extends BaseBean {
 		this.lastThread = lastThread;
 	}
 
+	public Set<PlatformUser> getAdministrators() {
+		return administrators;
+	}
+
+	public void setAdministrators(Set<PlatformUser> administrators) {
+		this.administrators = administrators;
+	}
 }

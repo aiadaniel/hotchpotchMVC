@@ -2,9 +2,9 @@ CREATE DATABASE IF NOT EXISTS hotchpotchMVC CHARACTER SET utf8;
 
 USE hotchpotchMVC;
 
-DROP TABLE IF EXISTS tb_platform_users;
+DROP TABLE IF EXISTS tb_platform_user;
 
-CREATE TABLE tb_platform_users (
+CREATE TABLE tb_platform_user (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	user_id INTEGER UNSIGNED UNIQUE COMMENT '用户全局id，区别主键id',
 	nickname VARCHAR(45) NOT NULL UNIQUE,

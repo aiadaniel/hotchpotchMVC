@@ -6,6 +6,9 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -18,6 +21,10 @@ import javax.persistence.TemporalType;
 //Ьћзг
 public class Thread extends BaseBean {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
+	
 	@ManyToOne
 	@JoinColumn(name = "board_id")
 	private Board board;
@@ -30,7 +37,7 @@ public class Thread extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")
-	private Person author;
+	private PlatformUser author;
 
 	private String ipCreated;
 
@@ -38,7 +45,7 @@ public class Thread extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "author_last_replied_id")
-	private Person authorLastReplied;
+	private PlatformUser authorLastReplied;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateLastReplied;
@@ -49,19 +56,27 @@ public class Thread extends BaseBean {
 
 	private int replyCount;
 
-	public Person getAuthor() {
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public PlatformUser getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(Person author) {
+	public void setAuthor(PlatformUser author) {
 		this.author = author;
 	}
 
-	public Person getAuthorLastReplied() {
+	public PlatformUser getAuthorLastReplied() {
 		return authorLastReplied;
 	}
 
-	public void setAuthorLastReplied(Person authorLastReplied) {
+	public void setAuthorLastReplied(PlatformUser authorLastReplied) {
 		this.authorLastReplied = authorLastReplied;
 	}
 

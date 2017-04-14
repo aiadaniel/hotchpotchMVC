@@ -1,61 +1,173 @@
 package com.weeds.domain;
 
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "tb_platform_users")
+@Table(name = "tb_platform_user")
 public class PlatformUser extends BaseBean {
 	
+	@TableGenerator(name="uid_gen",initialValue=10000000)
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE,generator="uid_gen")
+	private Integer id;//控制uid起始值。 比如vip从10000000开始。。。
+
+	@Column(length = 45,nullable=false,unique=true)
 	private String nickname;
-	private String avatar;
-	private String identity_type;//登录类型，用户名、手机、邮箱、第三方等
-	private String identifier;//手机、邮箱、用户名、第三方等的唯一id
-	private String credential;//密码or token
-	private String randCredential;//密码随机数 salt
-	private int login_type;
 	
-	public int getLogin_type() {
-		return login_type;
+	private String avatar;//default varchar(255)
+	
+	@Column(columnDefinition = "tinyint unsigned",nullable=false)//columnDefinition只在建表时有用
+	private String identity_type;// 登录类型，用户名、手机、邮箱、第三方等
+	
+	@Column(length = 128)
+	private String identifier;// 手机、邮箱、用户名、第三方等的唯一id
+	
+	private String credential;// 密码or token
+	
+	@Column(length=12)
+	private String randCredential;// 密码随机数 salt，最大暂定12
+	
+	@Column(columnDefinition = "tinyint")
+	private byte login_type;
+	
+	@Column(columnDefinition = "tinyint(2)")
+	private byte sex;
+	
+	private Date birthday = new Date();//相当于设置default
+	
+	private String email;// 跟identifier是否重复了？
+
+	@Temporal(value = TemporalType.TIMESTAMP)
+	private Date dateLastActived = new Date();
+
+	private String ipLastActived;
+
+	@ManyToMany(mappedBy = "administrators")
+	private Set<Board> boardsAdministrated = new HashSet<Board>();
+
+	public Integer getId() {
+		return id;
 	}
-	public void setLogin_type(int login_type) {
-		this.login_type = login_type;
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
+
 	public String getNickname() {
 		return nickname;
 	}
+
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-	public String getIdentity_type() {
-		return identity_type;
-	}
-	public void setIdentity_type(String identity_type) {
-		this.identity_type = identity_type;
-	}
-	public String getIdentifier() {
-		return identifier;
-	}
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-	public String getCredential() {
-		return credential;
-	}
-	public void setCredential(String credential) {
-		this.credential = credential;
-	}
-	public String getRandCredential() {
-		return randCredential;
-	}
-	public void setRandCredential(String randCredential) {
-		this.randCredential = randCredential;
-	}
+
 	public String getAvatar() {
 		return avatar;
 	}
+
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+
+	public String getIdentity_type() {
+		return identity_type;
+	}
+
+	public void setIdentity_type(String identity_type) {
+		this.identity_type = identity_type;
+	}
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+
+	public String getCredential() {
+		return credential;
+	}
+
+	public void setCredential(String credential) {
+		this.credential = credential;
+	}
+
+	public String getRandCredential() {
+		return randCredential;
+	}
+
+	public void setRandCredential(String randCredential) {
+		this.randCredential = randCredential;
+	}
+
+	public byte getLogin_type() {
+		return login_type;
+	}
+
+	public void setLogin_type(byte login_type) {
+		this.login_type = login_type;
+	}
+
+	public byte getSex() {
+		return sex;
+	}
+
+	public void setSex(byte sex) {
+		this.sex = sex;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public Date getDateLastActived() {
+		return dateLastActived;
+	}
+
+	public void setDateLastActived(Date dateLastActived) {
+		this.dateLastActived = dateLastActived;
+	}
+
+	public String getIpLastActived() {
+		return ipLastActived;
+	}
+
+	public void setIpLastActived(String ipLastActived) {
+		this.ipLastActived = ipLastActived;
+	}
+
+	public Set<Board> getBoardsAdministrated() {
+		return boardsAdministrated;
+	}
+
+	public void setBoardsAdministrated(Set<Board> boardsAdministrated) {
+		this.boardsAdministrated = boardsAdministrated;
 	}
 
 }
