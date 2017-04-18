@@ -13,4 +13,10 @@ public class Constant {
 	public static final int COOKIE_AGE_ONE_HOUR = 60*60;
 	public static final int COOKIE_AGE_ONE_DAY = 24*60*60;
 	public static final int COOKIE_AGE_ONE_WEEK = 7*24*60*60;
+	
+	public static final String IDENTITY_NAME = "name";
+	public static final String IDENTITY_PHONE = "phone";
+	public static final String IDENTITY_MAIN = "mail";
+	public static final String IDENTITY_SINA = "sina";
+	public static final String IDENTITY_WEIXIN = "weixin";
 }

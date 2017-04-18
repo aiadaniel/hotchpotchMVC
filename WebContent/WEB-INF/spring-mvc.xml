@@ -76,6 +76,8 @@
 				<!-- javax.persistence.validation.mode默认情况下是auto的，就是说如果不设置的话它是会自动去你的classpath下面找一个bean-validation**包 
 					所以把它设置为none即可 -->
 				javax.persistence.validation.mode=none
+				<!-- 这项配置为了使用主键初始值，具体查网络http://www.cnblogs.com/lj95801/p/5003580.html。-->
+				hibernate.id.new_generator_mappings=true
 			</value>
 		</property>
 		<property name="packagesToScan">

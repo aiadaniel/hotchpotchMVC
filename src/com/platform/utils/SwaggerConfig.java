@@ -24,7 +24,8 @@ public class SwaggerConfig {
 	@Bean
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("v1").select().apis(RequestHandlerSelectors.any())
-				.paths(PathSelectors.ant("/forum/**")).build().apiInfo(apiInfo());
+				.paths(PathSelectors.ant("/**"))
+				.build().apiInfo(apiInfo());
 	}
 	
 	private ApiInfo apiInfo() {

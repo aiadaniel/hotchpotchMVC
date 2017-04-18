@@ -26,7 +26,7 @@ public class UserDao<T extends BaseBean> extends HibernateDaoSupport implements 
 	public T find(Class<T> clazz, String nickname) {
 		//System.out.println("== i got user dao find");
 		// todo: adjust login type
-		String sql = "SELECT * FROM tb_platform_users WHERE nickname = '"  + nickname + "'";
+		String sql = "SELECT * FROM tb_platform_user WHERE nickname = '"  + nickname + "'";
 		//List<T> users = (List<T>) getHibernateTemplate().find(sql, nickname);//only for hql
 		SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
 		List<T> users = sqlQuery.list();

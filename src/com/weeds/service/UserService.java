@@ -36,7 +36,7 @@ public class UserService<T extends BaseBean> implements IService<T> {
 //		return new UserDao<PlatformUser>();
 //	}
 	
-	public int userRegist(PlatformUser basebean ) {
+	public long userRegist(PlatformUser basebean ) {
 		if (dao.find(null, basebean.getNickname())!= null ) {
 			return ErrCodeBase.ERR_USER_ALREADY;
 		}
@@ -46,17 +46,18 @@ public class UserService<T extends BaseBean> implements IService<T> {
 			String credential = basebean.getCredential() + salt;
 			try {
 				basebean.setCredential(MD5Utils.getEncryptedPwd(credential));
+				basebean.setRandCredential(salt);
 			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			basebean.setRandCredential(salt);
+			
 			if (dao.create(basebean) != ErrCodeBase.ERR_SUC) {
 				return ErrCodeBase.ERR_FAIL;
 			}
 		}
-		
-		return ErrCodeBase.ERR_SUC;
+		//when we success to persist obj,the primary key id will be set in obj
+		return basebean.getId();
 	}
 	
 	public int login(PlatformUser user,StringBuffer sb) {

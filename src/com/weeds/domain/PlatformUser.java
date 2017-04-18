@@ -29,8 +29,8 @@ public class PlatformUser extends BaseBean {
 	
 	private String avatar;//default varchar(255)
 	
-	@Column(columnDefinition = "tinyint unsigned",nullable=false)//columnDefinition只在建表时有用
-	private String identity_type;// 登录类型，用户名、手机、邮箱、第三方等
+//	@Column(columnDefinition = "tinyint unsigned",nullable=false)//columnDefinition只在建表时有用
+//	private String identity_type;// 登录类型，用户名、手机、邮箱、第三方等
 	
 	@Column(length = 128)
 	private String identifier;// 手机、邮箱、用户名、第三方等的唯一id
@@ -80,14 +80,6 @@ public class PlatformUser extends BaseBean {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
-	}
-
-	public String getIdentity_type() {
-		return identity_type;
-	}
-
-	public void setIdentity_type(String identity_type) {
-		this.identity_type = identity_type;
 	}
 
 	public String getIdentifier() {
