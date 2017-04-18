@@ -6,10 +6,11 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import org.springframework.stereotype.Repository;
 
 import com.platform.utils.ErrCodeBase;
 
-
+@Repository
 public class BaseDao<T> extends HibernateDaoSupport implements IDao<T> {
 	
 	@Autowired  
@@ -50,7 +51,12 @@ public class BaseDao<T> extends HibernateDaoSupport implements IDao<T> {
 
 	@Override
 	public int getTotalCount(String sql, Object... params) {
-		return 0;
+		Query query = createQuery(sql);
+		for (int i = 0; i < params.length; i++) {
+			query.setParameter(i+1, params[i]);
+		}
+		Object object = createQuery(sql).uniqueResult();
+		return ((Long)object).intValue();
 	}
 
 	@Override
@@ -60,7 +66,7 @@ public class BaseDao<T> extends HibernateDaoSupport implements IDao<T> {
 
 	@Override
 	public Query createQuery(String query) {
-		return null;
+		return currentSession().createQuery(query);
 	}
 
 }

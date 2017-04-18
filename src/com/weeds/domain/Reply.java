@@ -22,7 +22,7 @@ public class Reply extends BaseBean {
 	
 	@ManyToOne
 	@JoinColumn(name = "thread_id")
-	private Thread thread;
+	private Posts thread;
 
 	private String title;
 
@@ -77,11 +77,11 @@ public class Reply extends BaseBean {
 		this.ipCreated = ipCreated;
 	}
 
-	public Thread getThread() {
+	public Posts getThread() {
 		return thread;
 	}
 
-	public void setThread(Thread thread) {
+	public void setThread(Posts thread) {
 		this.thread = thread;
 	}
 

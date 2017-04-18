@@ -19,7 +19,7 @@ import javax.persistence.TemporalType;
 @Table(name="tb_thread")
 //@org.hibernate.annotations.Entity
 //Ьћзг
-public class Thread extends BaseBean {
+public class Posts extends BaseBean {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.weeds.domain.Board;
+import com.weeds.domain.Category;
 import com.weeds.service.BoardService;
+import com.weeds.service.CategoryService;
 
 
 @RestController
@@ -36,6 +38,9 @@ public class BoardController {
 	@Autowired
 	//@Qualifier("boardService")
 	BoardService<Board> boardService;
+	
+	@Autowired
+	CategoryService<Category> categoryService;
 	
 	/*
 	 * 这里遇到延迟加载问题了failed to lazily initialize a collection of role:。。。     
@@ -70,14 +75,18 @@ public class BoardController {
 	/*
 	 * 聊天吹水、交友征婚、服饰、美容、瘦身、美食、旅游、家居、汽车、婚嫁、亲子、上班、求职、招聘、房产、商业信息的发布
 	 */
-	@PostMapping("/board/add/{name}/{des}/{id}")
+	@PostMapping("/board/add/{name}/{des}/{cid}")
 	@ApiOperation(value="添加板块",httpMethod="POST",notes="该接口用于添加板块")
 	public ResponseEntity<?> addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name,
 			@ApiParam(required=false,name="des",value="欲添加板块描述") @PathVariable String des,
-			@ApiParam(required=true,name="id",value="板块id") @PathVariable int id) {
+			@ApiParam(required=true,name="cid",value="分类id") @PathVariable int cid) {
 		logger.info("==add board {}",name);
 		Board board = new Board();
-		board.setId(id);
+		Category category = categoryService.find(Category.class, cid);
+		if (category == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		board.setCategory(category);;
 		board.setName(name);
 		board.setDateCreated(new Date());
 		board.setDescription(des);

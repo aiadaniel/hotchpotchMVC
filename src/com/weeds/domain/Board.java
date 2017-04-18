@@ -84,7 +84,7 @@ public class Board extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "last_thread_id")
-	private Thread lastThread;
+	private Posts lastThread;
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "board_administrator", 
@@ -150,11 +150,11 @@ public class Board extends BaseBean {
 		this.lastReply = lastReply;
 	}
 
-	public Thread getLastThread() {
+	public Posts getLastThread() {
 		return lastThread;
 	}
 
-	public void setLastThread(Thread lastThread) {
+	public void setLastThread(Posts lastThread) {
 		this.lastThread = lastThread;
 	}
 

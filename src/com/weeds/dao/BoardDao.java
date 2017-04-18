@@ -4,7 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import com.weeds.domain.Board;
 
-@Repository
+//@Repository
 public class BoardDao<T extends Board> extends BaseDao<T>{
 
 	
