@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="tb_thread")
 //@org.hibernate.annotations.Entity
@@ -27,6 +29,7 @@ public class Posts extends BaseBean {
 	
 	@ManyToOne
 	@JoinColumn(name = "board_id")
+	@JsonIgnore
 	private Board board;
 
 	private String title;
