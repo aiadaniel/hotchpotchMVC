@@ -14,6 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="tb_board")
 //°å¿é
@@ -88,6 +90,7 @@ public class Board extends BaseBean {
 	@JoinTable(name = "board_administrator", 
 				joinColumns = { @JoinColumn(name = "board_id") }, 
 				inverseJoinColumns = { @JoinColumn(name = "platformuser_id") })
+	@JsonIgnore
 	private Set<PlatformUser> administrators = new HashSet<PlatformUser>();
 	
 

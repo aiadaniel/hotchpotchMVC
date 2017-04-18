@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="tb_category")
 //Àà±ð
@@ -34,6 +36,7 @@ public class Category extends BaseBean {
 	private String name;
 
 	@OneToMany(mappedBy = "category")
+	@JsonIgnore
 	private List<Board> boards = new ArrayList<Board>();
 
 	public Integer getId() {

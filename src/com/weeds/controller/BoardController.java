@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiParam;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Tuple;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +67,17 @@ public class BoardController {
 		
 		注意：如果使用eclipse启动tomcat时，需要将workspace下面 的server.xml 中的Connector也添加URIEncoding="UTF-8"
 	 */
-	@PostMapping("/board/add/{name}/{des}")
+	/*
+	 * 聊天吹水、交友征婚、服饰、美容、瘦身、美食、旅游、家居、汽车、婚嫁、亲子、上班、求职、招聘、房产、商业信息的发布
+	 */
+	@PostMapping("/board/add/{name}/{des}/{id}")
 	@ApiOperation(value="添加板块",httpMethod="POST",notes="该接口用于添加板块")
-	public ResponseEntity<?> addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name,@ApiParam(required=false,name="des",value="欲添加板块描述") @PathVariable String des) {
+	public ResponseEntity<?> addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name,
+			@ApiParam(required=false,name="des",value="欲添加板块描述") @PathVariable String des,
+			@ApiParam(required=true,name="id",value="板块id") @PathVariable int id) {
 		logger.info("==add board {}",name);
 		Board board = new Board();
+		board.setId(id);
 		board.setName(name);
 		board.setDateCreated(new Date());
 		board.setDescription(des);
