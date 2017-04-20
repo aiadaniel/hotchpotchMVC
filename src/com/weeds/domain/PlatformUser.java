@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -55,7 +56,10 @@ public class PlatformUser extends BaseBean {
 
 	private String ipLastActived;
 
-	@ManyToMany(mappedBy = "administrators")
+	/*
+	 * ALL时测试删除用户，其关联的板块也被全部删除
+	 */
+	@ManyToMany(mappedBy = "administrators",cascade={CascadeType.ALL})
 	private Set<Board> boardsAdministrated = new HashSet<Board>();
 
 	public Integer getId() {

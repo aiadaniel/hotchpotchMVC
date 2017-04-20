@@ -22,6 +22,11 @@ public class BaseService<T> implements IService<T> {
 	public void save(T basebean) {
 		dao.save(basebean);
 	}
+	
+	@Override
+	public void saveOrUpdate(T basebean) {
+		dao.saveOrUpdate(basebean);
+	};
 
 	@Override
 	public void delete(T basebean) {

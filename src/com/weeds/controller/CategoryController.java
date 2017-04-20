@@ -1,10 +1,12 @@
 package com.weeds.controller;
 
-import java.util.List;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.weeds.domain.Category;
-import com.weeds.service.IService;
+import com.weeds.service.CategoryService;
 
 @RestController
 @RequestMapping("/forum")
@@ -25,7 +27,7 @@ public class CategoryController {
 	
 	//创建删除分类、获取分类列表等
 	@Autowired
-	IService<Category> categoryService;
+	CategoryService<Category> categoryService;
 	
 	@GetMapping("/category/list")
 	@ResponseBody
@@ -41,9 +43,15 @@ public class CategoryController {
 	@GetMapping("/category/create/{cname}")
 	@ApiOperation(value="创建分类",notes="创建分类入口")
 	public ResponseEntity<?> createCategory(@ApiParam(required=true,name="cname",value="输入分类名") @PathVariable String cname) {
+		Map<String, Integer> res = new HashMap<String, Integer>();
+		if (categoryService.find(cname) != null) {
+			res.put("reason", -1);
+			return new ResponseEntity<>(res,HttpStatus.NOT_FOUND);
+		}
 		Category category = new Category();
 		category.setName(cname);
 		categoryService.create(category);
-		return new ResponseEntity<>(HttpStatus.OK);
+		res.put("categoryid", category.getId());
+		return new ResponseEntity<>(res,HttpStatus.OK);
 	}
 }

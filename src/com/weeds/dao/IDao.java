@@ -14,6 +14,8 @@ public interface IDao<T> {
 	
 	public void save(T basebean);
 	
+	public void saveOrUpdate(T basebean);
+	
 	public void delete(T basebean);
 	
 	public List<T> list(String sql);//or hql and so on

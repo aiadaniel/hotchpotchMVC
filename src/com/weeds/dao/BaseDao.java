@@ -37,6 +37,12 @@ public class BaseDao<T> extends HibernateDaoSupport implements IDao<T> {
 
 	@Override
 	public void save(T basebean) {
+		getHibernateTemplate().save(basebean);//不同于persist，可以返回序列化对象
+	}
+	
+	@Override
+	public void saveOrUpdate(T basebean) {
+		getHibernateTemplate().saveOrUpdate(basebean);
 	}
 
 	@Override

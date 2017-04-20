@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
-    	http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
-        http://www.springframework.org/schema/beans 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd
@@ -16,5 +15,83 @@
 
 	<!-- spring 的自动注解，如果配置扫描包component-scan，其实可以不用这项 -->
 	<context:annotation-config />
+	<context:component-scan base-package="com.weeds.dao" />
+	<context:component-scan base-package="com.weeds.service" />
+	
+	
+	
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://localhost:3306/hotchpotchMVC?characterEncoding=UTF-8" />
+		<property name="user" value="root" />
+		<property name="password" value="123456" />
+		<property name="initialPoolSize" value="5" />
+	</bean>
+
+	<!-- for spring+hibernate transaction support -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+				hibernate.hbm2ddl.auto=update
+				hibernate.show_sql=true
+				hibernate.format_sql=true
+				hibernate.cache.use_second_level_cache=false
+				hibernate.cache.use_query_cache=false
+				hibernate.jdbc.fetch_size=50
+				hibernate.jdbc.batch_size=50
+				hibernate.connection.autocommit=true
+				hibernate.connection.release_mode=auto
+				<!-- 创建session方式 hibernate4.x 的方式 -->
+				hibernate.current_session_context_class=org.springframework.orm.hibernate4.SpringSessionContext
+				<!-- javax.persistence.validation.mode默认情况下是auto的，就是说如果不设置的话它是会自动去你的classpath下面找一个bean-validation**包 
+					所以把它设置为none即可 -->
+				javax.persistence.validation.mode=none
+				<!-- 这项配置为了使用主键初始值，具体查网络http://www.cnblogs.com/lj95801/p/5003580.html。-->
+				hibernate.id.new_generator_mappings=true
+			</value>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.weeds.domain</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 使用注解式声明事务支持需要 -->
+	<tx:annotation-driven transaction-manager="txManager"></tx:annotation-driven>
+
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- <bean id="hibernateTransactionAttributeSource" class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource"> 
+		<property name="properties"> <props> <prop key="*">PROPAGATION_REQUIRED</prop> 
+		</props> </property> </bean> -->
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+ 			<tx:method name="get*" read-only="false" propagation="SUPPORTS" />
+			<tx:method name="find*" read-only="false" propagation="SUPPORTS" />
+			<tx:method name="create*" read-only="false"/>
+			<tx:method name="save*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="update*" />
+			<tx:method name="delete*" /> 
+			<!--<tx:method name="*"/>-->
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="bussinessService" expression="execution(* com.weeds..*.*(..))" />
+		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
+	</aop:config>
 
 </beans>

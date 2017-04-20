@@ -93,7 +93,6 @@ public class Board extends BaseBean {
 				inverseJoinColumns = { @JoinColumn(name = "platformuser_id") })
 	@JsonIgnore
 	private Set<PlatformUser> administrators = new HashSet<PlatformUser>();
-	
 
 	public Integer getId() {
 		return id;
@@ -165,5 +164,13 @@ public class Board extends BaseBean {
 
 	public void setAdministrators(Set<PlatformUser> administrators) {
 		this.administrators = administrators;
+	}
+	
+	public void addAdministrator(PlatformUser user) {
+		this.administrators.add(user);
+	}
+	
+	public void removeAdministrator(PlatformUser user) {
+		this.administrators.remove(user);
 	}
 }

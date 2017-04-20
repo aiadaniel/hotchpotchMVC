@@ -2,15 +2,16 @@ package com.weeds.service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.utils.Constant;
 import com.platform.utils.ErrCodeBase;
 import com.platform.utils.MD5Utils;
+import com.weeds.dao.IDao;
 import com.weeds.dao.UserDao;
 import com.weeds.domain.BaseBean;
 import com.weeds.domain.PlatformUser;
@@ -25,10 +26,10 @@ import com.weeds.domain.PlatformUser;
  */
 @Transactional
 @Service
-public class UserService<T extends BaseBean> implements IService<T> {
+public class UserService<T extends BaseBean> extends BaseService<T> {
 	
 	@Autowired
-	UserDao<PlatformUser> dao;
+	UserDao<PlatformUser> udao;
 	
 	//这种方式声明的bean耦合度比较高，是否放到xml去声明好些~
 //	@Bean
@@ -36,8 +37,14 @@ public class UserService<T extends BaseBean> implements IService<T> {
 //		return new UserDao<PlatformUser>();
 //	}
 	
+	@Autowired
+	//@Qualifier("baseDao")
+	public void setDao(IDao<T> d) {
+		dao = d;
+	}
+	
 	public long userRegist(PlatformUser basebean ) {
-		if (dao.find(null, basebean.getNickname())!= null ) {
+		if (udao.find(null, basebean.getNickname())!= null ) {
 			return ErrCodeBase.ERR_USER_ALREADY;
 		}
 		//first we need to generate salt for login by nickname
@@ -52,7 +59,7 @@ public class UserService<T extends BaseBean> implements IService<T> {
 				e.printStackTrace();
 			}
 			
-			if (dao.create(basebean) != ErrCodeBase.ERR_SUC) {
+			if (udao.create(basebean) != ErrCodeBase.ERR_SUC) {
 				return ErrCodeBase.ERR_FAIL;
 			}
 		}
@@ -61,7 +68,7 @@ public class UserService<T extends BaseBean> implements IService<T> {
 	}
 	
 	public int login(PlatformUser user,StringBuffer sb) {
-		PlatformUser tempUser = (PlatformUser) dao.find(null, user.getNickname());
+		PlatformUser tempUser = (PlatformUser) udao.find(null, user.getNickname());
 		if (tempUser == null) {
 			return ErrCodeBase.ERR_URER_NOEXISTS;
 		}
@@ -80,39 +87,6 @@ public class UserService<T extends BaseBean> implements IService<T> {
 		}
 		
 		return ErrCodeBase.ERR_FAIL;
-	}
-
-	@Override
-	public T find(Class<T> clazz, int id) {
-		return null;
-	}
-
-	@Override
-	public int create(T basebean) {
-		return 0;
-	}
-
-	@Override
-	public void save(T basebean) {
-	}
-
-	@Override
-	public void delete(T basebean) {
-	}
-
-	@Override
-	public List<T> list(String sql) {
-		return null;
-	}
-
-	@Override
-	public int getTotalCount(String sql, Object... params) {
-		return 0;
-	}
-
-	@Override
-	public List<T> list(String sql, int first, int max, Object... params) {
-		return null;
 	}
 
 }
