@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,6 +60,15 @@ public class BoardController {
 	public List<Board> listBoard() {
 		String hql = "from Board";
 		return boardService.list(hql);
+	}
+	
+	@PostMapping("/board/getAdmins/{boardid}")
+	@ApiOperation(value="查询板块管理员")
+	public Set<PlatformUser> getAdmins(@ApiParam(required=true,name="boardid",value="板块id") @PathVariable int boardid) {
+		Set<PlatformUser> users = new HashSet<PlatformUser>();
+		Board board = boardService.find(Board.class, boardid);
+		users = board.getAdministrators();
+		return users;
 	}
 	
 	/*

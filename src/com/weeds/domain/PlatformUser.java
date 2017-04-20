@@ -16,6 +16,8 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "tb_platform_user")
 public class PlatformUser extends BaseBean {
@@ -58,8 +60,11 @@ public class PlatformUser extends BaseBean {
 
 	/*
 	 * ALL时测试删除用户，其关联的板块也被全部删除
+	 * 方法是手动删除？ 
+	 * 主控方控制应该可以做
 	 */
-	@ManyToMany(mappedBy = "administrators",cascade={CascadeType.ALL})
+	@ManyToMany(mappedBy = "administrators"/*,cascade={CascadeType.ALL}*/)
+	@JsonIgnore
 	private Set<Board> boardsAdministrated = new HashSet<Board>();
 
 	public Integer getId() {

@@ -5,7 +5,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.utils.Constant;
+import com.weeds.domain.Board;
 import com.weeds.domain.PlatformUser;
 import com.weeds.model.TokenModel;
 import com.weeds.service.UserService;
@@ -84,6 +88,14 @@ public class UserController {
 		if (user == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		
+		//for @ManyToMany association we need to delete mapping first from Ö÷¿Ø·½
+		Set<Board> boards = user.getBoardsAdministrated();
+		for (Iterator<Board> iterator = boards.iterator(); iterator.hasNext();) {
+			Board board = (Board) iterator.next();
+			board.removeAdministrator(user);
+		}
+		
 		userService.delete(user);
 		logger.debug("== after uid is {}",user.getId());
 		return new ResponseEntity<>(HttpStatus.OK);

@@ -91,7 +91,7 @@ public class Board extends BaseBean {
 	@JoinTable(name = "board_administrator", 
 				joinColumns = { @JoinColumn(name = "board_id") }, 
 				inverseJoinColumns = { @JoinColumn(name = "platformuser_id") })
-	@JsonIgnore
+	//@JsonIgnore
 	private Set<PlatformUser> administrators = new HashSet<PlatformUser>();
 
 	public Integer getId() {
