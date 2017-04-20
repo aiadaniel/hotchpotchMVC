@@ -3,6 +3,7 @@ package com.weeds.domain;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,7 +28,7 @@ public class Posts extends BaseBean {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	@ManyToOne
+	@ManyToOne//(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE})
 	@JoinColumn(name = "board_id")
 	@JsonIgnore
 	private Board board;

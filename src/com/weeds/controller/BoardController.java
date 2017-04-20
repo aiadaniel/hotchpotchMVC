@@ -5,9 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.persistence.Tuple;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,16 +81,18 @@ public class BoardController {
 			@ApiParam(required=false,name="des",value="”˚ÃÌº”∞ÂøÈ√Ë ˆ") @PathVariable String des,
 			@ApiParam(required=true,name="cid",value="∑÷¿‡id") @PathVariable int cid) {
 		logger.info("==add board {}",name);
+		Map<String, Integer> res = new HashMap<String, Integer>();
 		Board board = new Board();
 		Category category = categoryService.find(Category.class, cid);
 		if (category == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(res,HttpStatus.NOT_FOUND);
 		}
 		board.setCategory(category);;
 		board.setName(name);
 		board.setDateCreated(new Date());
 		board.setDescription(des);
 		boardService.create(board);
-		return new ResponseEntity<>(HttpStatus.OK);
+		res.put("boardid", board.getId());
+		return new ResponseEntity<>(res,HttpStatus.OK);
 	}
 }

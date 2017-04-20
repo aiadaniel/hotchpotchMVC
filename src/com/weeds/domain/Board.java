@@ -78,6 +78,7 @@ public class Board extends BaseBean {
 
 	private int replyCount;
 
+	
 	@ManyToOne
 	@JoinColumn(name = "last_reply_id")
 	private Reply lastReply;

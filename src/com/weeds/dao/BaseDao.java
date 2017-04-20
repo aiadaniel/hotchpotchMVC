@@ -41,6 +41,7 @@ public class BaseDao<T> extends HibernateDaoSupport implements IDao<T> {
 
 	@Override
 	public void delete(T basebean) {
+		getHibernateTemplate().delete(basebean);
 	}
 
 	@SuppressWarnings("unchecked")

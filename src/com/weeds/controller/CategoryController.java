@@ -38,11 +38,11 @@ public class CategoryController {
 	/*
 	 * 
 	 */
-	@GetMapping("/category/create/{cid}")
+	@GetMapping("/category/create/{cname}")
 	@ApiOperation(value="创建分类",notes="创建分类入口")
-	public ResponseEntity<?> createCategory(@ApiParam(required=true,name="cid",value="输入分类名") @PathVariable String cid) {
+	public ResponseEntity<?> createCategory(@ApiParam(required=true,name="cname",value="输入分类名") @PathVariable String cname) {
 		Category category = new Category();
-		category.setName(cid);
+		category.setName(cname);
 		categoryService.create(category);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

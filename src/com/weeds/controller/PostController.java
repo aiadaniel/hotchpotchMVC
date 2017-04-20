@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.weeds.domain.Board;
 import com.weeds.domain.Posts;
+import com.weeds.domain.pojo.PoBoard;
 import com.weeds.service.IService;
 
 @RestController
@@ -48,10 +49,11 @@ public class PostController {
 	public ResponseEntity<?> createNewPost(@ApiParam(required=true,name="boardid",value="板块id")@PathVariable int boardid,
 						@ApiParam(required=true,name="title",value="标题")@PathVariable String title,
 						@ApiParam(required=true,name="content",value="内容")@PathVariable String content) {
+		PoBoard poBoard = new PoBoard();
 		//找出板块、user=>增加帖子=>更新最后时间
 		Board board = boardService.find(Board.class, boardid);
 		if (board == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(poBoard,HttpStatus.NOT_FOUND);
 		}
 		Posts posts = new Posts();
 		posts.setBoard(board);
@@ -66,9 +68,27 @@ public class PostController {
 		
 		postService.create(posts);
 		if (posts.getId() > 0) {
-			return new ResponseEntity<>(HttpStatus.OK);
+			poBoard.setCategoryid(posts.getBoard().getCategory().getId());
+			poBoard.setId(posts.getId());
+			poBoard.setName(posts.getTitle());
+			return new ResponseEntity<>(poBoard,HttpStatus.OK);
 		}
 		
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	/*
+	 * 直接删除明显会失败，因为外键关联的原因。 所以建表时能否设置级联方式？
+	 * 先更新外键才能删除
+	 */
+	@PostMapping("/delete/{postid}")
+	@ApiOperation(value="删除帖子")
+	public ResponseEntity<?> deletePost(@ApiParam(required=true,name="postid",value="待删id") @PathVariable int postid) {
+		Posts basebean = postService.find(Posts.class, postid);
+		if (basebean!=null) {//should we adjust board id too ?
+			postService.delete(basebean);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 }
