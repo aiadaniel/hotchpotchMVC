@@ -42,17 +42,37 @@ public class Posts extends BaseBean {
 	@JoinColumn(name = "author_id")
 	private PlatformUser author;
 
+	@JsonIgnore
 	private String ipCreated;
 
-	private int hit;
+	@JsonIgnore
+	private int hit;//点击数
+	
+	private int prise;//点赞
+	private int down;//踩
+
+	public int getPrise() {
+		return prise;
+	}
+
+	public void setPrise(int prise) {
+		this.prise = prise;
+	}
+
+	public int getDown() {
+		return down;
+	}
+
+	public void setDown(int down) {
+		this.down = down;
+	}
 
 	@ManyToOne
 	@JoinColumn(name = "author_last_replied_id")
-	@JsonIgnore
-	private PlatformUser authorLastReplied;
+	private PlatformUser authorLastReplied;//最后回复人
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date dateLastReplied;
+	private Date dateLastReplied;//最后回复日期
 
 	private boolean readonly;
 

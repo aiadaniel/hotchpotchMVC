@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,26 +35,34 @@ public class PlatformUser extends BaseBean {
 //	private String identity_type;// 登录类型，用户名、手机、邮箱、第三方等
 	
 	@Column(length = 128)
+	@JsonIgnore
 	private String identifier;// 手机、邮箱、用户名、第三方等的唯一id
 	
+	@JsonIgnore
 	private String credential;// 密码or token
 	
 	@Column(length=12)
+	@JsonIgnore
 	private String randCredential;// 密码随机数 salt，最大暂定12
 	
 	@Column(columnDefinition = "tinyint")
+	@JsonIgnore
 	private byte login_type;
 	
 	@Column(columnDefinition = "tinyint(2)")
 	private byte sex;
 	
+	@JsonIgnore
 	private Date birthday = new Date();//相当于设置default
 	
+	@JsonIgnore
 	private String email;// 跟identifier是否重复了？
 
 	@Temporal(value = TemporalType.TIMESTAMP)
+	@JsonIgnore
 	private Date dateLastActived = new Date();
 
+	@JsonIgnore
 	private String ipLastActived;
 
 	/*

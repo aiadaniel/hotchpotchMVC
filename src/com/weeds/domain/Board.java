@@ -14,8 +14,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name="tb_board")
 //板块
@@ -68,16 +66,15 @@ public class Board extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "category_id")
-	@JsonIgnore
 	private Category category;
 
 	private String name;
 
 	private String description;
 
-	private int threadCount;
+	private int threadCount;//整板块帖子数
 
-	private int replyCount;
+	private int replyCount;//整板块回复数
 
 	
 	@ManyToOne

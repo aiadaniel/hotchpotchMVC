@@ -7,15 +7,20 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @MappedSuperclass
 public class BaseBean {
 	
 	@Version
+	@JsonIgnore
 	private Integer version;
 	
+	@JsonIgnore
 	private boolean deleted;
 	
 	@Temporal(value = TemporalType.TIMESTAMP)
+	@JsonIgnore
 	private Date dateCreated;
 
 

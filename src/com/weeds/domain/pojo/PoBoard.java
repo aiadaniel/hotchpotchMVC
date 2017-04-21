@@ -1,5 +1,7 @@
 package com.weeds.domain.pojo;
 
+import java.util.Set;
+
 
 public class PoBoard {
 
@@ -18,6 +20,26 @@ public class PoBoard {
 	private Integer lastReplyid;
 
 	private Integer lastThreadid;
+	
+	PoPosts poPosts;
+	
+	Set<PoUser> admins;
+
+	public PoPosts getPoPosts() {
+		return poPosts;
+	}
+
+	public void setPoPosts(PoPosts poPosts) {
+		this.poPosts = poPosts;
+	}
+
+	public Set<PoUser> getAdmins() {
+		return admins;
+	}
+
+	public void setAdmins(Set<PoUser> admins) {
+		this.admins = admins;
+	}
 
 	public Integer getId() {
 		return id;

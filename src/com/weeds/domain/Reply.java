@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="tb_reply")
 //@org.hibernate.annotations.Entity
@@ -33,8 +35,9 @@ public class Reply extends BaseBean {
 	@JoinColumn(name = "author_id")
 	private PlatformUser author;
 
-	private int floor;
+	private int floor;//Â¥²ã
 
+	@JsonIgnore
 	private String ipCreated;
 
 	public Integer getId() {
