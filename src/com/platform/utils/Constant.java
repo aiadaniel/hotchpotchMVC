@@ -19,4 +19,7 @@ public class Constant {
 	public static final String IDENTITY_MAIN = "mail";
 	public static final String IDENTITY_SINA = "sina";
 	public static final String IDENTITY_WEIXIN = "weixin";
+	
+	public static final String TOKEN = "token";
+	public static final String CURRENT_UID = "uid";
 }

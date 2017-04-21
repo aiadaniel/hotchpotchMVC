@@ -44,8 +44,22 @@
 	<context:component-scan base-package="com.weeds.controller" />
 	<context:component-scan base-package="com.platform.utils" />
 
+<!-- 	<bean id="authorization" class="com.platform.interceptor.AuthorizationInterceptor"/>
+	<bean id="handlerMapping"
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="authorization"/>
+			</list>
+		</property>
+	</bean> -->
 
-
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="com.platform.interceptor.AuthorizationInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
 	
 
 	

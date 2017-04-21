@@ -1,5 +1,6 @@
 package com.weeds.token;
 
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -14,17 +15,18 @@ public class BasicTokenManager implements TokenManager {
 	@Override
 	public TokenModel createToken(long uid) {
 		String token = uid + " " + UUID.randomUUID().toString().replace("-", "");
-		return new TokenModel(uid, token);
+		return new TokenModel(uid+"", token);
 	}
 
 	@Override
 	public boolean checkToken(TokenModel model) {
-		return true;
+		int res = new Random().nextInt();//œ»ÀÊª˙ ‘ ‘
+		return res%2==0;
 	}
 
 	@Override
 	public TokenModel getTokenModel(String auth) {
-		return null;
+		return new TokenModel("xxx", "haha");
 	}
 
 	@Override
