@@ -68,6 +68,7 @@ public class Board extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "category_id")
+	@JsonIgnore
 	private Category category;
 
 	private String name;
@@ -83,9 +84,12 @@ public class Board extends BaseBean {
 	@JoinColumn(name = "last_reply_id")
 	private Reply lastReply;
 
-	@ManyToOne
+	
+	//ManyToOne不需要集合类型？
+	@ManyToOne//(cascade={CascadeType.PERSIST,CascadeType.MERGE})
 	@JoinColumn(name = "last_thread_id")
 	private Posts lastThread;
+	
 
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "board_administrator", 

@@ -41,4 +41,12 @@ public class PostService extends BaseService<Posts> {
 				.executeUpdate();
 		return ErrCodeBase.ERR_SUC;
 	}
+	
+	public Posts deleteAndLast(Posts basebean) {
+		dao.delete(basebean);
+		//get last post and return
+		Posts lastpost = (Posts) dao.createQuery("from Posts p where p.board.id = :boardid order by p.id desc")/*where p.id < :lastid */
+				.setParameter("boardid", basebean.getBoard().getId()).setMaxResults(1).uniqueResult();
+		return lastpost;
+	}
 }

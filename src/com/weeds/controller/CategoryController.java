@@ -21,7 +21,7 @@ import com.weeds.domain.Category;
 import com.weeds.service.CategoryService;
 
 @RestController
-@RequestMapping("/forum")
+@RequestMapping("/forum/category")
 @Api(value="分类api")
 public class CategoryController {
 	
@@ -29,7 +29,7 @@ public class CategoryController {
 	@Autowired
 	CategoryService<Category> categoryService;
 	
-	@GetMapping("/category/list")
+	@GetMapping("/list")
 	@ResponseBody
 	@ApiOperation(value="所有分类",notes="列表展示分类")
 	public List<Category> listCategory() {
@@ -40,7 +40,7 @@ public class CategoryController {
 	/*
 	 * 
 	 */
-	@GetMapping("/category/create/{cname}")
+	@GetMapping("/create/{cname}")
 	@ApiOperation(value="创建分类",notes="创建分类入口")
 	public ResponseEntity<?> createCategory(@ApiParam(required=true,name="cname",value="输入分类名") @PathVariable String cname) {
 		Map<String, Integer> res = new HashMap<String, Integer>();

@@ -3,7 +3,6 @@ package com.weeds.domain;
 import java.util.Date;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,7 +27,7 @@ public class Posts extends BaseBean {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	@ManyToOne//(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE})
+	@ManyToOne//(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE,CascadeType.REFRESH})
 	@JoinColumn(name = "board_id")
 	@JsonIgnore
 	private Board board;
@@ -49,6 +48,7 @@ public class Posts extends BaseBean {
 
 	@ManyToOne
 	@JoinColumn(name = "author_last_replied_id")
+	@JsonIgnore
 	private PlatformUser authorLastReplied;
 
 	@Temporal(TemporalType.TIMESTAMP)

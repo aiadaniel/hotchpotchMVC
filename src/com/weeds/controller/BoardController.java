@@ -33,7 +33,7 @@ import com.weeds.service.UserService;
 
 
 @RestController
-@RequestMapping("/forum")
+@RequestMapping("/forum/board")
 @Api(value="板块api")
 public class BoardController {
 	
@@ -55,14 +55,14 @@ public class BoardController {
 	 * 这里遇到延迟加载问题了failed to lazily initialize a collection of role:。。。     
 	 * 			 no Session (through reference chain:
 	 */
-	@PostMapping("/board/list")
+	@PostMapping("/list")
 	@ResponseBody
 	public List<Board> listBoard() {
 		String hql = "from Board";
 		return boardService.list(hql);
 	}
 	
-	@PostMapping("/board/getAdmins/{boardid}")
+	@PostMapping("/getAdmins/{boardid}")
 	@ApiOperation(value="查询板块管理员")
 	public Set<PlatformUser> getAdmins(@ApiParam(required=true,name="boardid",value="板块id") @PathVariable int boardid) {
 		Set<PlatformUser> users = new HashSet<PlatformUser>();
@@ -93,7 +93,7 @@ public class BoardController {
 	/*
 	 * 聊天吹水、交友征婚、服饰、美容、瘦身、美食、旅游、家居、汽车、婚嫁、亲子、上班、求职、招聘、房产、商业信息的发布
 	 */
-	@PostMapping("/board/add/{name}/{des}/{cid}/{uid}")
+	@PostMapping("/add/{name}/{des}/{cid}/{uid}")
 	@ApiOperation(value="添加板块",httpMethod="POST",notes="该接口用于添加板块")
 	public ResponseEntity<?> addBoard(@ApiParam(required=true,name="name",value="欲添加板块名") @PathVariable String name,
 			@ApiParam(required=false,name="des",value="欲添加板块描述") @PathVariable String des,
