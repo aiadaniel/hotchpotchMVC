@@ -25,7 +25,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
-		logger.info("==preHandle");
+		//logger.info("==preHandle");
 		//如果不是映射到方法直接通过
 		if (!(handler instanceof HandlerMethod)) {
 			return true;
@@ -35,7 +35,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         
         //从header中得到token
         String authorization = request.getHeader(Constant.TOKEN);
-        logger.info("==i got token from client {}",authorization);
+        //logger.info("==i got token from client {}",authorization);
         //验证token
         TokenModel model = tokenMgr.getTokenModel(authorization);
         if (tokenMgr.checkToken(model)) {

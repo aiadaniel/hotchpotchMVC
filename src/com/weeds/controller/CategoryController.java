@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.platform.interceptor.Authorization;
 import com.weeds.domain.Category;
 import com.weeds.service.CategoryService;
 
@@ -30,7 +29,7 @@ public class CategoryController {
 	@Autowired
 	CategoryService<Category> categoryService;
 	
-	@Authorization
+	//@Authorization
 	@GetMapping("/list")
 	@ResponseBody
 	@ApiOperation(value="所有分类",notes="列表展示分类")

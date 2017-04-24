@@ -116,7 +116,7 @@ public class BoardController {
 		board.setDateCreated(new Date());
 		board.setDescription(des);
 		
-		Set<PlatformUser> admins = new HashSet<PlatformUser>();
+		HashSet<PlatformUser> admins = new HashSet<PlatformUser>();
 		admins.add(user);
 		board.setAdministrators(admins);
 		boardService.saveOrUpdate(board);//not use persist and it work without 

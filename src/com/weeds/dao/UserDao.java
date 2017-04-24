@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.weeds.domain.PlatformUser;
 
 @Repository
-public class UserDao<T extends PlatformUser> extends BaseDao<T> {
+public class UserDao<T extends PlatformUser> extends BaseDao<T,String,String> {
 	
 	@Autowired  
 	public void setMySessionFactory(SessionFactory sessionFactory){  

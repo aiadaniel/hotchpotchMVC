@@ -25,7 +25,7 @@ public class CategoryService<T extends Category> extends BaseService<T> {
 	@SuppressWarnings("unchecked")
 	public Category find(String cname) {
 		String hql = "from Category c where c.name=:cname";
-		BaseDao<T> bdao = (BaseDao<T>) dao;
+		BaseDao<T,String,Category> bdao = (BaseDao<T,String,Category>) dao;
 		Query query = bdao.createQuery(hql).setParameter("cname", cname);
 		List<Category> lists = query.list();
 		if (lists.size() > 0) {

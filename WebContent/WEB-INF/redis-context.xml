@@ -33,5 +33,9 @@
     <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
         <property name="connectionFactory"   ref="connectionFactory" />  
     </bean>  
+    
+<!--     <bean id="kvTemplate" class="org.springframework.data.redis.core.RedisKeyValueTemplate">
+    	<property name="connectionFactory"   ref="connectionFactory" />  
+    </bean> -->
 
 </beans>

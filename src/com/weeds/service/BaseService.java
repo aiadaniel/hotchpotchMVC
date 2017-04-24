@@ -2,14 +2,16 @@ package com.weeds.service;
 
 import java.util.List;
 
-import org.springframework.data.redis.core.RedisTemplate;
-
 import com.weeds.dao.IDao;
 
-public class BaseService<T>/*,V extends BaseBean> extends RedisService<String,V> */implements IService<T> {
+public class BaseService<T>/*V extends BaseBean> extends RedisService<String,V> */implements IService<T> {
 	
 	public IDao<T> dao;
 	
+	//写死了key不灵活
+	//另外hibernate 有自己的缓存系统
+	//redis是否放在dao层?
+	//@Autowired
 	//protected RedisTemplate<String, V> redisTemplate;
 
 	@Override
