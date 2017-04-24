@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.utils.Constant;
+import com.platform.utils.ResultStatus;
 import com.weeds.domain.Board;
 import com.weeds.domain.PlatformUser;
+import com.weeds.model.ResultModel;
 import com.weeds.model.TokenModel;
 import com.weeds.service.UserService;
 import com.weeds.token.TokenManager;
@@ -69,12 +71,27 @@ public class UserController {
 		
 	}
 	
+	/*
+	 * TODO: use token for login
+	 */
 	@PostMapping(path="/login/{nickname}/{password}"/*,params="myparam=1"*/)
-	public String login(@PathVariable String nickname,@PathVariable String password) {//方式1
+	@ApiOperation(value="没有token时的登录")
+	public String login(@ApiParam(required=true,name="nickname",value="昵称") @PathVariable String nickname,
+			@ApiParam(required=true,name="password",value="密码") @PathVariable String password) {//方式1
+		logger.info("== i got login {}  {}", nickname,password);
 		
-		//System.out.println("== i got login " + nickname + "  " + password);
-		logger.debug("== i got login {}  {}", nickname,password);
+		//we need to return token
 		return "en " + nickname + " !";
+	}
+	
+	@PostMapping("/loginbytoken/{token}")
+	@ApiOperation(value="token登录")
+	public ResponseEntity<?> loginByToken(@ApiParam(required=true,name="token",value="token值") @PathVariable String token) {
+		TokenModel model = basicTokenMgr.getTokenModel(token);
+		if (!basicTokenMgr.checkToken(model)) {
+			return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR),HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	/*
@@ -96,7 +113,7 @@ public class UserController {
 		}
 		
 		userService.delete(user);
-		logger.debug("== after uid is {}",user.getId());
+		logger.info("== after uid is {}",user.getId());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

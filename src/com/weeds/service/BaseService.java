@@ -2,11 +2,15 @@ package com.weeds.service;
 
 import java.util.List;
 
+import org.springframework.data.redis.core.RedisTemplate;
+
 import com.weeds.dao.IDao;
 
-public class BaseService<T> implements IService<T> {
+public class BaseService<T>/*,V extends BaseBean> extends RedisService<String,V> */implements IService<T> {
 	
 	public IDao<T> dao;
+	
+	//protected RedisTemplate<String, V> redisTemplate;
 
 	@Override
 	public T find(Class<T> clazz, int id) {

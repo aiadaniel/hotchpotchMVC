@@ -1,5 +1,6 @@
 package com.weeds.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.MappedSuperclass;
@@ -9,8 +10,9 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@SuppressWarnings("serial")
 @MappedSuperclass
-public class BaseBean {
+public class BaseBean implements Serializable{
 	
 	@Version
 	@JsonIgnore

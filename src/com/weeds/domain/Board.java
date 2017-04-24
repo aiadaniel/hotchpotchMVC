@@ -60,6 +60,8 @@ public class Board extends BaseBean {
 	+----------------+--------------+------+-----+---------+----------------+
 	 */
 	
+	private static final long serialVersionUID = -1262003162605870603L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;

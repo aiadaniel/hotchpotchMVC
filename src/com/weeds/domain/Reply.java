@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 //»ØÌû
 public class Reply extends BaseBean {
 
+	private static final long serialVersionUID = 7701768827905279582L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;

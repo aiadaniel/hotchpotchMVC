@@ -29,6 +29,8 @@ public class Category extends BaseBean {
 	+-------------+--------------+------+-----+---------+----------------+
 	 */
 	
+	private static final long serialVersionUID = 141567183512940177L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;

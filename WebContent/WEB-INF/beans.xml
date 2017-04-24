@@ -95,5 +95,7 @@
 		<aop:pointcut id="bussinessService" expression="execution(* com.weeds..*.*(..))" />
 		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
 	</aop:config>
+	
+	<import resource="redis-context.xml"/>
 
 </beans>

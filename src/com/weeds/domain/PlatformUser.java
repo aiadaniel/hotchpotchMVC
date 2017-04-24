@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "tb_platform_user")
 public class PlatformUser extends BaseBean {
 	
+	private static final long serialVersionUID = 2120004248455526708L;
+
 	@TableGenerator(name="uid_gen",initialValue=10000000)
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE,generator="uid_gen")
