@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.platform.utils.Constant;
 import com.platform.utils.ResultStatus;
+import com.weeds.apiversion.ApiVersion;
 import com.weeds.domain.Board;
 import com.weeds.domain.PlatformUser;
 import com.weeds.model.ResultModel;
@@ -50,6 +51,7 @@ public class UserController {
 	 * 			and return a token to client for next login
 	 */
 	@PostMapping(path = "/regist")
+	@ApiVersion(3)
 	@ApiOperation(value="用户注册",httpMethod="POST",response=String.class,notes="该接口用于用户注册")
 	public ResponseEntity<?> regist(@RequestParam String nickname,@RequestParam String password) {
 		//System.out.println("== i got regist!");

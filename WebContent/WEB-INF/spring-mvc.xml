@@ -40,9 +40,16 @@
 
 	<!-- mvc使用注解 -->
 	<mvc:annotation-driven />
+<!-- 	<bean id="handlerMapping"
+		class="com.weeds.apiversion.CustomRequestMappingHandlerMapping">
+		<property name=""></property>
+	</bean> -->
+	
+	<context:component-scan base-package="com.weeds.apiversion"/>
 	<context:component-scan base-package="com.weeds.token" />
 	<context:component-scan base-package="com.weeds.controller" />
 	<context:component-scan base-package="com.platform.utils" />
+	
 
 <!-- 	<bean id="authorization" class="com.platform.interceptor.AuthorizationInterceptor"/>
 	<bean id="handlerMapping"

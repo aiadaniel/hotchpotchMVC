@@ -75,35 +75,35 @@ public class BaseDao<T,K,V> extends HibernateDaoSupport implements IDao<T> {
 	@Override
 	public List<T> list(String sql) {
 		//add redis support
-		List<T> result = redisTemplate.execute(new RedisCallback<List<T>>() {
-			@Override
-			public List<T> doInRedis(RedisConnection connection) throws DataAccessException {
-				List<T> res = new ArrayList<T>();
-				RedisSerializer<String> serializer = getRedisSerializer();//仅针对String类型的序列化
-				byte[] key = serializer.serialize(sql);
-				long end = connection.lLen(key);
-				if (end == 0) {
-					//first time we need to add to redis
-					res = (List<T>) getHibernateTemplate().find(sql);//对于延迟加载对象如何处理?
-					for (int i = 0; i < res.size(); i++) {
-						T item = res.get(i);
-						connection.rPush(key, SerializationUtils.serialize(item));//对于自定义对象需要自己实现序列化
-						logger.error("==redis set key {} value {}", key,item);
-					}
-					return res;
-				}
-				List<byte[]> value =  connection.lRange(key, 0, end);
-				for (int i = 0; i < value.size(); i++) {
-					T item = (T) SerializationUtils.deserialize(value.get(i));
-					res.add(item);
-					logger.error("==redis get key {} value {}",key,item);
-				}
-				return res;
-			}
-		});
-		return result;
+//		List<T> result = redisTemplate.execute(new RedisCallback<List<T>>() {
+//			@Override
+//			public List<T> doInRedis(RedisConnection connection) throws DataAccessException {
+//				List<T> res = new ArrayList<T>();
+//				RedisSerializer<String> serializer = getRedisSerializer();//仅针对String类型的序列化
+//				byte[] key = serializer.serialize(sql);
+//				long end = connection.lLen(key);
+//				if (end == 0) {
+//					//first time we need to add to redis
+//					res = (List<T>) getHibernateTemplate().find(sql);//对于延迟加载对象如何处理?
+//					for (int i = 0; i < res.size(); i++) {
+//						T item = res.get(i);
+//						connection.rPush(key, SerializationUtils.serialize(item));//对于自定义对象需要自己实现序列化
+//						logger.error("==redis set key {} value {}", key,item);
+//					}
+//					return res;
+//				}
+//				List<byte[]> value =  connection.lRange(key, 0, end);
+//				for (int i = 0; i < value.size(); i++) {
+//					T item = (T) SerializationUtils.deserialize(value.get(i));
+//					res.add(item);
+//					logger.error("==redis get key {} value {}",key,item);
+//				}
+//				return res;
+//			}
+//		});
+//		return result;
 		
-//		return (List<T>) getHibernateTemplate().find(sql);
+		return (List<T>) getHibernateTemplate().find(sql);
 	}
 
 	@Override

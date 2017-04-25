@@ -25,10 +25,17 @@ public class SwaggerConfig {
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("v1").select().apis(RequestHandlerSelectors.any())
 				.paths(PathSelectors.ant("/**"))
-				.build().apiInfo(apiInfo());
+				.build().apiInfo(apiInfo("0.0.1"));
 	}
 	
-	private ApiInfo apiInfo() {
-		return new ApiInfo("forum api online", "api debug", "0.0.1", null, new Contact("daniel", null, null), null, null);
+	@Bean
+	public Docket api2() {
+		return new Docket(DocumentationType.SWAGGER_2).groupName("v2").select().apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.ant("/v2/**"))
+				.build().apiInfo(apiInfo("0.0.2"));
+	}
+	
+	private ApiInfo apiInfo(String v) {
+		return new ApiInfo("forum api online", "api debug", v, null, new Contact("daniel", null, null), null, null);
 	}
 }
