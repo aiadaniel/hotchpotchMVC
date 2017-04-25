@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:aop="http://www.springframework.org/schema/aop" 
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/tx
@@ -16,23 +14,21 @@
 	<!-- spring 的自动注解，如果配置扫描包component-scan，其实可以不用这项 -->
 	<context:annotation-config />
 	
+	<!-- spring的属性加载器，加载properties文件中的属性  引入后发现底下jdbc又不行了。。。-->  
+<!-- 	<bean id="propertyConfigurer"  
+	    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+	    <property name="location">  
+	        <value>/WEB-INF/application.properties</value>  
+	    </property>  
+	    <property name="fileEncoding" value="utf-8" />  
+	</bean>  --> 
+	
+
 	<!-- 还可以使用 <context:exclude-filter这个方式，过滤掉需要留给mvc配置去加载的包 -->
 	<context:component-scan base-package="com.weeds.dao" />
 	<context:component-scan base-package="com.weeds.service" />
-	
-	
-	
+
 	<aop:aspectj-autoproxy proxy-target-class="true" />
-	
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-		destroy-method="close">
-		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl"
-			value="jdbc:mysql://localhost:3306/hotchpotchMVC?characterEncoding=UTF-8" />
-		<property name="user" value="root" />
-		<property name="password" value="123456" />
-		<property name="initialPoolSize" value="5" />
-	</bean>
 
 	<!-- for spring+hibernate transaction support -->
 	<bean id="sessionFactory"
@@ -56,7 +52,7 @@
 				<!-- javax.persistence.validation.mode默认情况下是auto的，就是说如果不设置的话它是会自动去你的classpath下面找一个bean-validation**包 
 					所以把它设置为none即可 -->
 				javax.persistence.validation.mode=none
-				<!-- 这项配置为了使用主键初始值，具体查网络http://www.cnblogs.com/lj95801/p/5003580.html。-->
+				<!-- 这项配置为了使用主键初始值，具体查网络http://www.cnblogs.com/lj95801/p/5003580.html。 -->
 				hibernate.id.new_generator_mappings=true
 			</value>
 		</property>
@@ -81,13 +77,13 @@
 
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
- 			<tx:method name="get*" read-only="false" propagation="SUPPORTS" />
+			<tx:method name="get*" read-only="false" propagation="SUPPORTS" />
 			<tx:method name="find*" read-only="false" propagation="SUPPORTS" />
-			<tx:method name="create*" read-only="false"/>
-			<tx:method name="save*" read-only="false" propagation="REQUIRED"/>
+			<tx:method name="create*" read-only="false" />
+			<tx:method name="save*" read-only="false" propagation="REQUIRED" />
 			<tx:method name="update*" />
-			<tx:method name="delete*" /> 
-			<!--<tx:method name="*"/>-->
+			<tx:method name="delete*" />
+			<!--<tx:method name="*"/> -->
 		</tx:attributes>
 	</tx:advice>
 
@@ -95,7 +91,50 @@
 		<aop:pointcut id="bussinessService" expression="execution(* com.weeds..*.*(..))" />
 		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
 	</aop:config>
+
+	<!-- 当前引入这种方式导致placeholder占位符失效，需要查下为啥 -->
+	<!-- <import resource="redis-context.xml" /> -->
 	
-	<import resource="redis-context.xml"/>
+	<!-- 开发环境 -->
+	<beans profile="dev">
+		<context:property-placeholder location="/WEB-INF/property/jdbc-dev.properties"/>
+		<context:property-placeholder location="/WEB-INF/application.properties"/>
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}"/>
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+	
+	<!-- 测试环境 -->
+ 	<beans profile="qa">
+		<context:property-placeholder location="classpath*:jdbc-qa.properties"/>
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.user}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+	
+	<!-- 生产环境 -->
+ 	<beans profile="prod">
+ 		<context:property-placeholder location="/WEB-INF/property/jdbc-prod.properties"/>
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+	
+	
 
 </beans>

@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.utils.Constant;
 import com.platform.utils.ResultStatus;
@@ -132,5 +135,14 @@ public class UserController {
 	public List<PlatformUser> getUsers() {
 		//List<PlatformUser> users = new ArrayList<PlatformUser>();
 		return userService.list("from PlatformUser");
+	}
+	
+	@PostMapping("/upload/avatar/{uid}")
+	@ApiOperation(value="上传用户头像")
+	public ResponseEntity<?> uploadUserAvartar(@ApiParam(required=true,name="uid") @PathVariable int uid,
+			@RequestParam("file") MultipartFile file,
+			HttpServletRequest request) {
+		userService.uploadImg(uid, file, request);
+		return new ResponseEntity<>(ResultModel.ok(),HttpStatus.OK);
 	}
 }

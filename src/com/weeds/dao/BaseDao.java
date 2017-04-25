@@ -24,15 +24,12 @@ public class BaseDao<T,K,V> extends HibernateDaoSupport implements IDao<T> {
 	
 	private Logger logger = LoggerFactory.getLogger(BaseDao.class);
 	
-	@Autowired
-	protected RedisTemplate<K, V> redisTemplate;
+//	@Autowired
+//	protected RedisTemplate<K, V> redisTemplate;
 	
-	//@Autowired
-	//protected RedisTemplate<K, V> kvTemplate;
-	
-	protected RedisSerializer<String> getRedisSerializer() {
-		return redisTemplate.getStringSerializer();
-	}
+//	protected RedisSerializer<String> getRedisSerializer() {
+//		return redisTemplate.getStringSerializer();
+//	}
 	
 	@Autowired  
 	public void setMySessionFactory(SessionFactory sessionFactory){  

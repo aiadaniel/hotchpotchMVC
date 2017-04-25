@@ -5,6 +5,12 @@
 	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
 	<!-- 启动 Spring的IOC容器：注意理论上可以只要spring mvc的ioc容器，这里分开比较优雅 -->
+	
+		<!-- 默认开发环境，还可以跟maven的profile结合来动态修改 -->
+	<context-param>
+		<param-name>spring.profiles.active</param-name>
+		<param-value>dev</param-value>
+	</context-param>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>

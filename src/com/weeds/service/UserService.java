@@ -1,11 +1,23 @@
 package com.weeds.service;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.utils.Constant;
 import com.platform.utils.ErrCodeBase;
@@ -25,10 +37,16 @@ import com.weeds.domain.PlatformUser;
  */
 @Transactional
 @Service
+//@PropertySource("file:${appProperties}")
 public class UserService<T extends BaseBean> extends BaseService<T> {
+	
+	private final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	@Autowired
 	UserDao<PlatformUser> udao;
+	
+	@Autowired
+	Environment env;
 	
 	//这种方式声明的bean耦合度比较高，是否放到xml去声明好些~
 //	@Bean
@@ -86,6 +104,80 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 		}
 		
 		return ErrCodeBase.ERR_FAIL;
+	}
+	
+	public Object uploadImg(int uid,MultipartFile file, HttpServletRequest request) {
+		PlatformUser user = udao.find(PlatformUser.class, uid);
+		HashMap<String, Object> ret = new HashMap<String, Object>();
+		if (file != null) {
+			if (!file.isEmpty()) {
+				try {
+
+					String rootPath = request.getServletContext().getRealPath("/");
+
+					String relativePath = env.getProperty("image.file.upload.dir");
+					logger.info("== env upload dir {}",relativePath);
+
+					File dir = new File(rootPath + File.separator + relativePath);
+					if (!dir.exists())
+						dir.mkdirs();
+					String fileExtension = getFileExtension(file);
+
+					// 生成UUID样式的文件名
+					String filename = java.util.UUID.randomUUID().toString() + "." + fileExtension;
+
+					String fullFilename = dir.getAbsolutePath() + File.separator + filename;
+
+					String relativeFile = relativePath + File.separator + filename;
+					
+//					long starttime = System.currentTimeMillis();
+//
+//					byte[] bytes = file.getBytes();
+//					File serverFile = new File(fullFilename);
+//					BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//					stream.write(bytes);
+//					stream.close();
+					
+					long endtime = System.currentTimeMillis();
+//					logger.warn("== stream diff {}",endtime-starttime);//6 6 5 8 22 5 
+					
+					//test transfer to 
+					File serverFile2 = new File(fullFilename);
+					file.transferTo(serverFile2);//this method finally invoke commons.io.IOUtils.copyLarge
+					long endtime2 = System.currentTimeMillis();
+					logger.warn("== transfer to diff {}",endtime2-endtime);//1 1 1 1 1 1 测试了6组数据，明显transfer效率高
+					
+					logger.info("Server File Location = " + serverFile2.getAbsolutePath());
+
+					String serverPath = new URL(request.getScheme(), request.getServerName(), request.getServerPort(),
+							request.getContextPath()).toString();
+					ret.put("url", serverPath + "/" + relativeFile);
+
+					user.setAvatar(relativeFile);
+					udao.save(user);
+
+				} catch (Exception e) {
+					logger.error("error: {}", e);
+					ret.put("url", "none");
+				}
+			}
+		}
+		return null;
+	}
+
+	public static String getFileExtension(MultipartFile file) {
+		if (file == null) {
+			return null;
+		}
+
+		String name = file.getOriginalFilename();
+		int extIndex = name.lastIndexOf(".");
+
+		if (extIndex == -1) {
+			return "";
+		} else {
+			return name.substring(extIndex + 1);
+		}
 	}
 
 }
