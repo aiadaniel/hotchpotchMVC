@@ -21,6 +21,9 @@
 		mapping="swagger-ui.html" />
 	<mvc:resources location="classpath:/META-INF/resources/webjars/"
 		mapping="/webjars/**" />
+		
+	<!-- 测试静态资源直接下载，资源要放在WebContent根目录下，在WEB-INF下不行 -->
+	<!-- <mvc:resources location="/test/" mapping="/test/**" /> -->
 
 	<!-- ViewResolver -->
 	<bean

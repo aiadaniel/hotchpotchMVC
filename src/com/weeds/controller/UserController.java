@@ -1,9 +1,12 @@
 package com.weeds.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.platform.utils.Constant;
+import com.platform.utils.MD5Utils;
 import com.platform.utils.ResultStatus;
 import com.weeds.apiversion.ApiVersion;
 import com.weeds.domain.Board;
@@ -81,20 +85,32 @@ public class UserController {
 	 */
 	@PostMapping(path="/login/{nickname}/{password}"/*,params="myparam=1"*/)
 	@ApiOperation(value="没有token时的登录")
-	public String login(@ApiParam(required=true,name="nickname",value="昵称") @PathVariable String nickname,
+	public ResponseEntity<?> login(@ApiParam(required=true,name="nickname",value="昵称") @PathVariable String nickname,
 			@ApiParam(required=true,name="password",value="密码") @PathVariable String password) {//方式1
-		logger.info("== i got login {}  {}", nickname,password);
+		PlatformUser user = userService.getUserByName(nickname);
+		String pass = password + user.getRandCredential();
+		try {
+			if (user.getCredential().equals(MD5Utils.getEncryptedPwd(pass))) {
+				TokenModel model = basicTokenMgr.createToken(user.getId());
+				return new ResponseEntity<>(ResultModel.ok(model),HttpStatus.OK);
+			}
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		
 		//we need to return token
-		return "en " + nickname + " !";
+		return new ResponseEntity<>(ResultModel.ok(null),HttpStatus.OK);
 	}
 	
 	@PostMapping("/loginbytoken/{token}")
 	@ApiOperation(value="token登录")
+	//@ApiImplicitParam(name="auth",required=true,dataType="string",paramType="header")//需要在请求头带认证字段
 	public ResponseEntity<?> loginByToken(@ApiParam(required=true,name="token",value="token值") @PathVariable String token) {
 		TokenModel model = basicTokenMgr.getTokenModel(token);
 		if (!basicTokenMgr.checkToken(model)) {
-			return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR),HttpStatus.OK);
+			return new ResponseEntity<>(ResultModel.error(ResultStatus.USER_TOKEN_TIMEOUT),HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

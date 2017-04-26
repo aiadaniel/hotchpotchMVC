@@ -64,6 +64,10 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 		dao = d;
 	}
 	
+	public PlatformUser getUserByName(String nickname) {
+		return udao.find(PlatformUser.class, nickname);
+	}
+	
 	public long userRegist(PlatformUser basebean ) {
 		if (udao.find(null, basebean.getNickname())!= null ) {
 			return ErrCodeBase.ERR_USER_ALREADY;
@@ -120,8 +124,7 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 					String rootPath = request.getServletContext().getRealPath("/");
 
 					String relativePath = env.getProperty("image.file.upload.dir");//这种方式取不到值，跟装配顺序有关吗？
-					logger.info("== env upload dir {}",relativePath);
-					logger.info("== env use value {}",uploadDir);
+					logger.info("== env upload dir: {} and uploaddir: {} ",relativePath,uploadDir);
 					relativePath = uploadDir;//TODO: 
 
 					File dir = new File(rootPath + File.separator + relativePath);
@@ -134,7 +137,10 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 
 					String fullFilename = dir.getAbsolutePath() + File.separator + filename;
 
-					String relativeFile = relativePath + File.separator + filename;
+					String relativeFile = /*relativePath + File.separator + */filename;
+					
+					logger.info("== abspath: {}",dir.getAbsolutePath());
+					logger.info("== rootpath: {} fullfilename: {} relativeFile: {}",rootPath,fullFilename,relativeFile);
 					
 //					long starttime = System.currentTimeMillis();
 //
@@ -164,8 +170,9 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 
 				} catch (Exception e) {
 					logger.error("error: {}", e);
-					ret.put("url", "none");
+					ret.put("url", "");
 				}
+				return ret;
 			}
 		}
 		return null;

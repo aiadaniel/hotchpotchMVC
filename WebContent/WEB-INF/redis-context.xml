@@ -35,14 +35,5 @@
 <!--     <bean id="kvTemplate" class="org.springframework.data.redis.core.RedisKeyValueTemplate">
     	<property name="connectionFactory"   ref="connectionFactory" />  
     </bean> -->
-    
-    <!-- scanner redis properties  -->
-	<beans profile="dev">
-    	<context:property-placeholder location="/WEB-INF/property/redis-dev.properties" />
-    </beans> 
-    
-     <beans profile="prod">
-    	<context:property-placeholder location="/WEB-INF/property/redis-prod.properties" />
-    </beans> 
 
 </beans>
