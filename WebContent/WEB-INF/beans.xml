@@ -95,10 +95,13 @@
 	<!-- 当前引入这种方式导致placeholder占位符失效，需要查下为啥 -->
 	<!-- <import resource="redis-context.xml" /> -->
 	
+	<!-- 只能存在一个property-placeholder实例，否则报错 -->
+	<!-- <context:property-placeholder location="/WEB-INF/application.properties" order="1"/> -->
+	
 	<!-- 开发环境 -->
 	<beans profile="dev">
-		<context:property-placeholder location="/WEB-INF/property/jdbc-dev.properties"/>
-		<context:property-placeholder location="/WEB-INF/application.properties"/>
+		<context:property-placeholder location="/WEB-INF/application.properties,/WEB-INF/property/jdbc-dev.properties" order="2"/>
+		
 		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 			destroy-method="close">
 			<property name="driverClass" value="${jdbc.driver}"/>
@@ -124,7 +127,7 @@
 	
 	<!-- 生产环境 -->
  	<beans profile="prod">
- 		<context:property-placeholder location="/WEB-INF/property/jdbc-prod.properties"/>
+ 		<context:property-placeholder location="/WEB-INF/application.properties,/WEB-INF/property/jdbc-prod.properties"/>
 		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 			destroy-method="close">
 			<property name="driverClass" value="${jdbc.driver}" />

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,9 @@ import com.weeds.domain.PlatformUser;
 public class UserService<T extends BaseBean> extends BaseService<T> {
 	
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
+	
+	@Value("${image.file.upload.dir}")//测试使用这种方式能正常获取到配置，缺点就是要定义一个局部变量，且不能为static或final
+	private String uploadDir;
 	
 	@Autowired
 	UserDao<PlatformUser> udao;
@@ -115,8 +119,10 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 
 					String rootPath = request.getServletContext().getRealPath("/");
 
-					String relativePath = env.getProperty("image.file.upload.dir");
+					String relativePath = env.getProperty("image.file.upload.dir");//这种方式取不到值，跟装配顺序有关吗？
 					logger.info("== env upload dir {}",relativePath);
+					logger.info("== env use value {}",uploadDir);
+					relativePath = uploadDir;//TODO: 
 
 					File dir = new File(rootPath + File.separator + relativePath);
 					if (!dir.exists())
