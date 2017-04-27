@@ -13,7 +13,7 @@ import com.weeds.model.TokenModel;
 @Component
 public class BasicTokenManager implements TokenManager {
 
-	private static final int TOKEN_TIMEOUT = 10;
+	private static final int TOKEN_TIMEOUT = 30;
 	
 	protected RedisTemplate<Long,String> redisTemplate;
 	
@@ -44,7 +44,7 @@ public class BasicTokenManager implements TokenManager {
             return false;
         }
         //如果验证成功，说明此用户进行了一次有效操作，延长token的过期时间
-        redisTemplate.boundValueOps(model.getUid()).expire(TOKEN_TIMEOUT, TimeUnit.HOURS);
+        redisTemplate.boundValueOps(model.getUid()).expire(TOKEN_TIMEOUT, TimeUnit.SECONDS);
         return true;
 	}
 

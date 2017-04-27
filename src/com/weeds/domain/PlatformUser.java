@@ -16,6 +16,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.platform.utils.Constant;
 
 @Entity
 @Table(name = "tb_platform_user")
@@ -180,4 +181,13 @@ public class PlatformUser extends BaseBean {
 		this.boardsAdministrated = boardsAdministrated;
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("==nickname: ").append(nickname).append(Constant.SEPARATOR_CR).
+			append("==id: ").append(id).append(Constant.SEPARATOR_CR).
+			append("==avatar: ").append(avatar).append(Constant.SEPARATOR_CR);
+		return sb.toString();
+		
+	}
 }

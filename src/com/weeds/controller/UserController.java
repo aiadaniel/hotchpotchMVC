@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,17 +84,27 @@ public class UserController {
 	
 	/*
 	 * TODO: use token for login
+	 * 另外登录成功后，怎样跟session结合？
 	 */
 	@PostMapping(path="/login/{nickname}/{password}"/*,params="myparam=1"*/)
 	@ApiOperation(value="没有token时的登录")
 	public ResponseEntity<?> login(@ApiParam(required=true,name="nickname",value="昵称") @PathVariable String nickname,
-			@ApiParam(required=true,name="password",value="密码") @PathVariable String password) {//方式1
+			@ApiParam(required=true,name="password",value="密码") @PathVariable String password,
+			HttpSession session) {//方式1
 		PlatformUser user = userService.getUserByName(nickname);
 		String pass = password + user.getRandCredential();
 		try {
 			if (user.getCredential().equals(MD5Utils.getEncryptedPwd(pass))) {
 				TokenModel model = basicTokenMgr.createToken(user.getId());
-				return new ResponseEntity<>(ResultModel.ok(model),HttpStatus.OK);
+				
+				//add to session for future use; 
+				//also can use @SessionAttribute & @ModelAttribute & ModelMap,in a simple controller
+				//实测在swagger两个页面分别登录不同账号，session里的user值会被后登录的覆盖，应该使用token来创建来验证用户信息，不用传统session
+//				session.setAttribute(Constant.SESS_CURRENTUSER, user);
+				//session.setMaxInactiveInterval(10);//secs
+				
+				String auth = model.getUid()+"_"+model.getToken();
+				return new ResponseEntity<>(ResultModel.ok(auth),HttpStatus.OK);
 			}
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -138,19 +150,21 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	
-	//json返回的一种方式，还可以直接gson+response write或者使用@responsebody
-//	@PostMapping("/userlist")
-	//@JsonView(View.Summary.class) //这种方式需要xml文件配置，使用@ResponseBody更为方便
-//	public User getUser() {
-//		return new User(new Random().nextLong(),"haha","heihei");
-//	}
-	
 	@GetMapping("/list")
 	@ApiOperation(value="列出所有用户")
-	public List<PlatformUser> getUsers() {
-		//List<PlatformUser> users = new ArrayList<PlatformUser>();
-		return userService.list("from PlatformUser");
+	//@ApiImplicitParam(name="auth",/*required=true,*/dataType="string",paramType="header")//需要在请求头带认证字段
+	public ResponseEntity<?> getUsers(/*@RequestHeader("auth") String auth,*/HttpSession session) {
+//		PlatformUser user = (PlatformUser) session.getAttribute(Constant.SESS_CURRENTUSER);
+//		if (user != null) {
+//			logger.info(user.toString());
+//		} else {
+//			logger.error("==can't get user from session");
+//		}
+		
+//		if (!basicTokenMgr.checkToken(basicTokenMgr.getTokenModel(auth))) {
+//			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//		}
+		return new ResponseEntity<>(userService.list("from PlatformUser"),HttpStatus.OK);
 	}
 	
 	@PostMapping("/upload/avatar/{uid}")

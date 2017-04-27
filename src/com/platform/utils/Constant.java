@@ -3,6 +3,7 @@ package com.platform.utils;
 public class Constant {
 	
 	public static final String SEPARATOR_COMMA = ",";
+	public static final String SEPARATOR_CR = "\r\n";
 	
 	public static final byte LOGIN_NAME = 1 << 0;//nickname
 	public static final byte LOGIN_PHONE = 1 << 1;
@@ -22,4 +23,6 @@ public class Constant {
 	
 	public static final String TOKEN = "token";
 	public static final String CURRENT_UID = "uid";
+	
+	public static final String SESS_CURRENTUSER = "user";
 }
