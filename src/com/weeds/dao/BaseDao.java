@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -74,32 +75,59 @@ public class BaseDao<T,K,V> extends HibernateDaoSupport implements IDao<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	//@Cacheable//该怎么用，实测发现使用ab压测10000并发，速度提升不明显，11条用户信息数据基本要7-10s才能完成
+	@Cacheable("lists")//实测发现使用ab压测10000并发，11条用户信息数据基本要5-7s才完成; 不使用@Cacheable注解发现很容易链接超时
 	public List<T> list(String sql) {
 		//add redis support
 		List<T> result = redisTemplate.execute(new RedisCallback<List<T>>() {
 			@Override
 			public List<T> doInRedis(RedisConnection connection) throws DataAccessException {
 				List<T> res = new ArrayList<T>();
-				RedisSerializer<String> serializer = getRedisSerializer();//仅针对String类型的序列化
-				byte[] key = serializer.serialize(sql);
-				long end = connection.lLen(key);
-				if (end == 0) {
-					//first time we need to add to redis
-					res = (List<T>) getHibernateTemplate().find(sql);//对于延迟加载对象如何处理? 为何再次开启就没有延迟加载问题了？？？
-					for (int i = 0; i < res.size(); i++) {
-						T item = res.get(i);
-						connection.rPush(key, SerializationUtils.serialize(item));//对于自定义对象需要自己实现序列化
-						//logger.error("==redis set key {} value {}", key,item);
-					}
+//				RedisSerializer<String> serializer = getRedisSerializer();//仅针对String类型的序列化
+//				byte[] key = serializer.serialize(sql);
+//				long len = connection.lLen(key);
+//				if (len == 0) {
+//					res = (List<T>) getHibernateTemplate().find(sql);//对于延迟加载对象如何处理? 为何再次开启就没有延迟加载问题了？？？
+//					for (int i = 0; i < res.size(); i++) {
+//						T item = res.get(i);
+//						long starttime = System.nanoTime();
+//						connection.rPush(key, SerializationUtils.serialize(item));//对于自定义对象需要自己实现序列化
+//						//logger.error("==redis set key {} value {}", key,item);
+//						long endtime = System.nanoTime();
+//						logger.error("== diff {} ms",(endtime-starttime)/1000);
+//					}
+//					return res;
+//				}
+//				List<byte[]> value =  connection.lRange(key, 0, end);
+//				for (int i = 0; i < value.size(); i++) {
+//					long starttime = System.nanoTime();
+//					T item = (T) SerializationUtils.deserialize(value.get(i));
+//					long endtime = System.nanoTime();
+//					logger.error("== diff revert {} ms",(endtime-starttime)/1000);//一个user数据就两字段要平均500ms+ ？？？
+//					res.add(item);
+//					//logger.error("==redis get key {} value {}",key,item);
+//				}
+				
+				//use another method
+				ListOperations<String, T> listOperations = (ListOperations<String, T>) redisTemplate.opsForList();
+				Long size = listOperations.size(sql);
+				if (size==0) {
+					res = (List<T>) getHibernateTemplate().find(sql);
+//					for (int i = 0; i < res.size(); i++) {
+//						long starttime = System.nanoTime();
+//						listOperations.rightPush(sql, res.get(i));
+//						long endtime = System.nanoTime();
+//						logger.error("== diff {} ms",(endtime-starttime)/1000);
+//					}
+//					long starttime = System.nanoTime();
+					listOperations.rightPushAll(sql, res);
+//					long endtime = System.nanoTime();
+//					logger.error("== diff {} ms",(endtime-starttime)/1000);
 					return res;
 				}
-				List<byte[]> value =  connection.lRange(key, 0, end);
-				for (int i = 0; i < value.size(); i++) {
-					T item = (T) SerializationUtils.deserialize(value.get(i));
-					res.add(item);
-					//logger.error("==redis get key {} value {}",key,item);
-				}
+//				long starttime = System.nanoTime();
+				res.addAll( listOperations.range(sql,0,size));
+//				long endtime = System.nanoTime();
+//				logger.error("== diff revert {} ms",(endtime-starttime)/1000);
 				return res;
 			}
 		});
