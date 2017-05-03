@@ -89,8 +89,11 @@
 
 	<!-- 要使用spring cache注解必须加这个在主配置文件 -->
 	<cache:annotation-driven />
+	
+	<bean id="myKeyGen" class="com.platform.utils.MyKeyGen"></bean>
 
 	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager" c:redis-operations-ref="redisTemplate">
+		<!-- <property name="defaultExpiration" value="600"></property> -->
 	</bean>
 
 

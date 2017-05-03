@@ -10,10 +10,14 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.hibernate.sql.Delete;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -41,6 +45,8 @@ import com.weeds.domain.PlatformUser;
 //@PropertySource("file:${appProperties}")
 public class UserService<T extends BaseBean> extends BaseService<T> {
 	
+	private static final String CACHE_NAME = "lists_PlatformUser";
+	
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	@Value("${image.file.upload.dir}")//测试使用这种方式能正常获取到配置，缺点就是要定义一个局部变量，且不能为static或final
@@ -64,10 +70,28 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 		dao = d;
 	}
 	
+	@Override
+	@CacheEvict(cacheNames=CACHE_NAME,key="'lists_PlatformUser'")
+	public void delete(T basebean) {
+		super.delete(basebean);
+	}
+	
+	@Override
+	/*
+	 * 从dao层的缓存移到service发现同样ab 10000并发压测性能降了一半。。。 机器问题
+	 * NOTE: 另外这样操作，在压测list接口时，同时在swagger ui操作删除某用户，压测时间明显增加，
+	 * 所以这种方式在增删改多的时候，应该没有起到缓存效果！！！
+	 */
+//	@Cacheable(cacheNames=CACHE_NAME,key="'lists_PlatformUser'")
+	public java.util.List<T> list(String sql) {
+		return super.list(sql);
+	};
+	
 	public PlatformUser getUserByName(String nickname) {
 		return udao.find(PlatformUser.class, nickname);
 	}
 	
+	@CacheEvict(cacheNames=CACHE_NAME,key="'lists_PlatformUser'")
 	public long userRegist(PlatformUser basebean ) {
 		if (udao.find(null, basebean.getNickname())!= null ) {
 			return ErrCodeBase.ERR_USER_ALREADY;
