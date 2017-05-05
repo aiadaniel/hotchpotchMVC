@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,12 +40,13 @@ public class PostController {
 	@Autowired
 	IService<PlatformUser> userService;
 	
-	@GetMapping("/list/{boardid}")
+	@GetMapping("/list/{boardid}/{index}")
 	@ApiOperation(value="列出帖子",notes="列出板块下的所有帖子")
-	public List<Posts> list(@ApiParam(required=false,name="boardid",value="板块id，未填时列出全部帖子") @PathVariable int boardid) {
-		logger.debug("==list post board id {}",boardid);
+	public List<Posts> list(@ApiParam(required=false,name="boardid",value="板块id，未填时列出全部帖子") @PathVariable int boardid,
+			@ApiParam(required=true,name="index",value="起始帖的索引，主要用于分页") @PathVariable int index) {
+		logger.debug("==list post board id {} index {}",boardid,index);
 		if (boardid > 0) {
-			return postService.list("from Posts p where p.board.id = " + boardid);
+			return postService.list("from Posts p where p.board.id = " + boardid + "  order by p.dateCreated desc ",index,10);
 		}
 		return postService.list("from Posts");
 	}
@@ -76,6 +78,7 @@ public class PostController {
 		posts.setIpCreated(ipRemote);
 		posts.setTitle(title);
 		posts.setTopped(false);
+		posts.setDateCreated(new Date());
 		
 		postService.create(posts);//没用上级联，而是自己写了sql语句更新板块
 		

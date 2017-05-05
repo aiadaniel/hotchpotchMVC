@@ -77,8 +77,7 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 	}
 	
 	@Override
-	/*
-	 * 从dao层的缓存移到service发现同样ab 10000并发压测性能降了一半。。。 机器问题
+	/* 
 	 * NOTE: 另外这样操作，在压测list接口时，同时在swagger ui操作删除某用户，压测时间明显增加，
 	 * 所以这种方式在增删改多的时候，应该没有起到缓存效果！！！
 	 */

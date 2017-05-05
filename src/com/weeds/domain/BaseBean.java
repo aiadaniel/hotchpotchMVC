@@ -10,10 +10,11 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@SuppressWarnings("serial")
 @MappedSuperclass
 public class BaseBean implements Serializable{
 	
+	private static final long serialVersionUID = -6603938214228541893L;
+
 	@Version
 	@JsonIgnore
 	private Integer version;
@@ -22,7 +23,7 @@ public class BaseBean implements Serializable{
 	private boolean deleted;
 	
 	@Temporal(value = TemporalType.TIMESTAMP)
-	@JsonIgnore
+	//@JsonIgnore
 	private Date dateCreated;
 
 
