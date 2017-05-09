@@ -90,7 +90,7 @@ public class PostService extends BaseService<Post> {
 			} else {
 				//Posts lastPosts = dao.find(Posts.class, lastid);
 				//logger.info("==lastpost {} & index is {}",lastPosts.getId(),operations.reverseRank(POSTS_LIST, lastPosts));
-				lastindex = operations.reverseRank(POSTS_KEY, lastid)+1;
+				lastindex = operations.reverseRank(POSTS_KEY, lastid)+1;//TODO: fix lastid not exist issue
 			}
 			Set<Integer> posts = operations.reverseRange(POSTS_KEY, lastindex, lastindex+pagesize-1);
 			if (posts != null) {
@@ -106,6 +106,16 @@ public class PostService extends BaseService<Post> {
 		
 		return super.list(hql);
 	}
+	
+	/*
+	 * we need to update redis cache too
+	 */
+	@Override
+	public void saveOrUpdate(Post basebean) {
+		super.saveOrUpdate(basebean);
+		HashOperations<String, String, Post> hashOperations = contentTemplate.opsForHash();
+		hashOperations.put(POSTS_LIST, basebean.getId()+"", basebean);
+	};
 	
 	@Override
 	public int create(Post basebean) {

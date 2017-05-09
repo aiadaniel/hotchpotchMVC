@@ -26,6 +26,7 @@ public class Reply extends BaseBean {
 	
 	@ManyToOne
 	@JoinColumn(name = "post_id")
+	@JsonIgnore
 	private Post post;
 
 	private String title;
