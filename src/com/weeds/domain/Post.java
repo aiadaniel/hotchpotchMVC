@@ -18,10 +18,10 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="tb_thread")
+@Table(name="tb_post")
 //@org.hibernate.annotations.Entity
 //Ьћзг
-public class Posts extends BaseBean {
+public class Post extends BaseBean {
 
 	private static final long serialVersionUID = -8691791635621827376L;
 

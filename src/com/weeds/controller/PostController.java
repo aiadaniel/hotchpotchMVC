@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.weeds.domain.Board;
 import com.weeds.domain.PlatformUser;
-import com.weeds.domain.Posts;
+import com.weeds.domain.Post;
 import com.weeds.domain.pojo.PoBoard;
 import com.weeds.service.IService;
 import com.weeds.service.PostService;
@@ -42,13 +42,13 @@ public class PostController {
 	
 	@GetMapping("/list/{boardid}/{index}")
 	@ApiOperation(value="列出帖子",notes="列出板块下的所有帖子")
-	public List<Posts> list(@ApiParam(required=false,name="boardid",value="板块id，未填时列出全部帖子") @PathVariable int boardid,
-			@ApiParam(required=true,name="index",value="起始帖的索引，主要用于分页") @PathVariable int index) {
+	public List<Post> list(@ApiParam(required=false,name="boardid",value="板块id，未填时列出全部帖子") @PathVariable int boardid,
+			@ApiParam(required=true,name="index",value="上次列表的最后id，主要用于分页") @PathVariable int index) {
 		logger.debug("==list post board id {} index {}",boardid,index);
 		if (boardid > 0) {
-			return postService.list("from Posts p where p.board.id = " + boardid + "  order by p.dateCreated desc ",index,10);
+			return postService.list("from Post p where p.board.id = " + boardid + "  order by p.dateCreated desc ",index,10);
 		}
-		return postService.list("from Posts");
+		return postService.list("from Post");
 	}
 	
 	@PostMapping("/create/{boardid}/{title}/{content}/{uid}")
@@ -67,7 +67,7 @@ public class PostController {
 		if (user == null) {
 			return new ResponseEntity<>(poBoard,HttpStatus.NOT_FOUND);
 		}
-		Posts posts = new Posts();
+		Post posts = new Post();
 		posts.setBoard(board);
 		
 		//TODO: may be should get PlatformUser info from session
@@ -101,13 +101,13 @@ public class PostController {
 	@ApiOperation(value="删除帖子")
 	public ResponseEntity<?> deletePost(@ApiParam(required=true,name="postid",value="待删id") @PathVariable int postid,
 			@ApiParam(required=true,name="boardid",value="板块id") @PathVariable int boardid) {
-		Posts basebean = postService.find(Posts.class, postid);
+		Post basebean = postService.find(Post.class, postid);
 		if (basebean!=null) {
 			Board board = boardService.find(Board.class, boardid);
-			board.setLastThread(null);//dis association
+			board.setLastPost(null);//dis association
 			
-			Posts lastPosts = postService.deleteAndLast(basebean);
-			board.setLastThread(lastPosts);
+			Post lastPosts = postService.deleteAndLast(basebean);
+			board.setLastPost(lastPosts);
 			boardService.saveOrUpdate(board);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

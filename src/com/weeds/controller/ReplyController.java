@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.weeds.domain.Board;
 import com.weeds.domain.PlatformUser;
-import com.weeds.domain.Posts;
+import com.weeds.domain.Post;
 import com.weeds.domain.Reply;
 import com.weeds.domain.pojo.PoReply;
 import com.weeds.service.IService;
@@ -49,7 +49,7 @@ public class ReplyController {
 	public List<Reply> list(@ApiParam(required=true,name="postid",value="Ìû×Óid") @PathVariable int postid) {
 		logger.debug("==list post id {}",postid);
 		if (postid > 0) {
-			return replyService.list("from Reply r where r.thread.id = " + postid);
+			return replyService.list("from Reply r where r.post.id = " + postid);
 		}
 		return null;
 	}
@@ -66,7 +66,7 @@ public class ReplyController {
 		if (user == null) {
 			return new ResponseEntity<>(poReply,HttpStatus.NOT_FOUND);
 		}
-		Posts posts = postService.find(Posts.class, postid);
+		Post posts = postService.find(Post.class, postid);
 		if (posts == null) {
 			return new ResponseEntity<>(poReply,HttpStatus.NOT_FOUND);
 		}
@@ -76,7 +76,7 @@ public class ReplyController {
 		reply.setAuthor(user);
 		reply.setContent(content);
 		reply.setTitle(title);
-		reply.setThread(posts);
+		reply.setPost(posts);
 		//need to deal with floor
 		reply.setFloor(posts.getReplyCount()+1);
 		
@@ -113,7 +113,7 @@ public class ReplyController {
 			@ApiParam(required=true,name="replyid",value="»Ø¸´id") @PathVariable int replyid) {
 		Reply basebean = replyService.find(Reply.class, replyid);
 		if (basebean!=null) {
-			Posts posts = basebean.getThread();
+			Post posts = basebean.getPost();
 			posts.setReplyCount(posts.getReplyCount()-1);
 			
 			Board board = posts.getBoard();

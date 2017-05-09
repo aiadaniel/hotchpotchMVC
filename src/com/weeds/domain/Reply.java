@@ -25,8 +25,8 @@ public class Reply extends BaseBean {
 	private Integer id;
 	
 	@ManyToOne
-	@JoinColumn(name = "thread_id")
-	private Posts thread;
+	@JoinColumn(name = "post_id")
+	private Post post;
 
 	private String title;
 
@@ -82,12 +82,12 @@ public class Reply extends BaseBean {
 		this.ipCreated = ipCreated;
 	}
 
-	public Posts getThread() {
-		return thread;
+	public Post getPost() {
+		return post;
 	}
 
-	public void setThread(Posts thread) {
-		this.thread = thread;
+	public void setPost(Post post) {
+		this.post = post;
 	}
 
 	public String getTitle() {

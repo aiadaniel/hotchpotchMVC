@@ -74,7 +74,7 @@ public class Board extends BaseBean {
 
 	private String description;
 
-	private int threadCount;//整板块帖子数
+	private int postCount;//整板块帖子数
 
 	private int replyCount;//整板块回复数
 
@@ -86,8 +86,8 @@ public class Board extends BaseBean {
 	
 	//ManyToOne不需要集合类型？
 	@ManyToOne//(cascade={CascadeType.PERSIST,CascadeType.MERGE})
-	@JoinColumn(name = "last_thread_id")
-	private Posts lastThread;
+	@JoinColumn(name = "last_post_id")
+	private Post lastPost;
 	
 
 	@ManyToMany(cascade = CascadeType.ALL)
@@ -137,12 +137,12 @@ public class Board extends BaseBean {
 		this.replyCount = replyCount;
 	}
 
-	public int getThreadCount() {
-		return threadCount;
+	public int getPostCount() {
+		return postCount;
 	}
 
-	public void setThreadCount(int threadCount) {
-		this.threadCount = threadCount;
+	public void setPostCount(int postCount) {
+		this.postCount = postCount;
 	}
 
 	public Reply getLastReply() {
@@ -153,12 +153,12 @@ public class Board extends BaseBean {
 		this.lastReply = lastReply;
 	}
 
-	public Posts getLastThread() {
-		return lastThread;
+	public Post getLastPost() {
+		return lastPost;
 	}
 
-	public void setLastThread(Posts lastThread) {
-		this.lastThread = lastThread;
+	public void setLastPost(Post lastPost) {
+		this.lastPost = lastPost;
 	}
 
 	public Set<PlatformUser> getAdministrators() {

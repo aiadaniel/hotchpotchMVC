@@ -1,15 +1,15 @@
 package com.weeds.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.connection.RedisZSetCommands.Range;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -17,29 +17,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.platform.utils.ErrCodeBase;
 import com.weeds.dao.IDao;
-import com.weeds.domain.Posts;
+import com.weeds.domain.Post;
 
 @Transactional
 @Service
-public class PostService extends BaseService<Posts> {
+public class PostService extends BaseService<Post> {
 	
 	private static final String POSTS_LIST = "allposts";
+	private static final String POSTS_KEY = "allposts_id";
 	
 	private final Logger logger = LoggerFactory.getLogger(PostService.class);
 
 	@Autowired
 	@Qualifier("baseDao")
-	public void setDao(IDao<Posts> d) {
+	public void setDao(IDao<Post> d) {
 		dao = d;
 	}
 	
 	@Autowired
-	protected RedisTemplate<String, Posts> redisTemplate;
+	protected RedisTemplate<String, Integer> redisTemplate;
+	
+	@Autowired
+	protected RedisTemplate<String, Post> contentTemplate;
 	
 	/*
 	 * TODO: 需要对sql做分页吧，比如每页5000条，否则会不会内存爆掉
-	 * 帖子缓存设计：由于列表会变动，分页需要一个上次的起始索引，索引还需要处理刚好该帖子被删的情况
-	 * 数据使用：
+	 * 
+	 * 帖子缓存设计：由于列表会变动，分页需要一个上次的起始索引，索引还需要处理刚好该帖子被删或者更新的情况
+	 * 数据使用： 
+	 * 
+	 * 
 	 * 			
 	 * 
 	 * 
@@ -51,8 +58,10 @@ public class PostService extends BaseService<Posts> {
 	 * timestamp 用于排序，以便返回的列表是按照时间顺序排列。微博的 id 用于业务下一步获取微博的相关信息。
 	 * 
 	 * 我们可以把关注及粉丝库也存在 zset 中，依旧使用 timestamp 来排序。key 是当前用户 uid。
+	 * 
+	 * TODO: 另外如果以zset存储postid(member)-timestamp(score)的数据，ts需要完全不重复，如何做，特别是并发时ts可能一样的
 	 */
-	public List<Posts> list(String hql,int lastid,int pagesize) {
+	public List<Post> list(String hql,int lastid,int pagesize) {
 //		ListOperations<String, Posts> listOperations = redisTemplate.opsForList();
 //		if (listOperations.size(POSTS_LIST)==0) {
 //			List<Posts> res = super.list(hql);
@@ -62,48 +71,67 @@ public class PostService extends BaseService<Posts> {
 //			listOperations.range(POSTS_LIST, lastid, lastid + pagesize);//err: lastid is not index
 //		}
 		
-//		ZSetOperations<String, Posts> operations = redisTemplate.opsForZSet();
-//		if (operations.size(hql) == 0) {
-//			List<Posts> res = super.list(hql);
-//			for (int i = 0; i < res.size(); i++) {
-//				Posts posts = res.get(i);
-//				operations.add(hql, posts,posts.getDateCreated().getTime());
-//			}
-//		} else {
-//			//set => list
-//			Range range = new Range();
-//			range.gt(lastid);
-//			range.lte(lastid+pagesize);
-//			return new ArrayList<Posts>(redisTemplate.opsForZSet().range(hql, lastid, pagesize));//err: pagesize is not score...
-//		}
+		ArrayList<Post> result = new ArrayList<Post>();
+		ZSetOperations<String, Integer> operations = redisTemplate.opsForZSet();
+		HashOperations<String, String, Post> hashOperations = contentTemplate.opsForHash();
+		if (operations.size(POSTS_KEY) == 0) {//TODO:we need a time to populate data
+			List<Post> res = super.list(hql);
+			for (int i = 0; i < res.size(); i++) {
+				Post posts = res.get(i);
+				operations.add(POSTS_KEY, posts.getId(),posts.getDateCreated().getTime());
+				hashOperations.put(POSTS_LIST, posts.getId()+"", posts); 
+			}
+		} else {
+			//set => list
+			//Range range = new Range();
+			Long lastindex = null;
+			if (lastid == 0) {
+				lastindex = Long.valueOf(0);
+			} else {
+				//Posts lastPosts = dao.find(Posts.class, lastid);
+				//logger.info("==lastpost {} & index is {}",lastPosts.getId(),operations.reverseRank(POSTS_LIST, lastPosts));
+				lastindex = operations.reverseRank(POSTS_KEY, lastid)+1;
+			}
+			Set<Integer> posts = operations.reverseRange(POSTS_KEY, lastindex, lastindex+pagesize-1);
+			if (posts != null) {
+				Iterator<Integer> iterator = posts.iterator();
+				while (iterator.hasNext()) {
+					Integer id = iterator.next();
+					result.add(hashOperations.get(POSTS_LIST, id+""));
+				}
+				return result;
+			}
+		}
 		
 		
 		return super.list(hql);
 	}
 	
 	@Override
-	public int create(Posts basebean) {
+	public int create(Post basebean) {
 		dao.create(basebean);
 		
 		//update board 
-		int totalPostCnt = dao.getTotalCount("select count(t) from Posts t " + 
+		int totalPostCnt = dao.getTotalCount("select count(t) from Post t " + 
 							" where t.deleted = false and t.board.id =  " + basebean.getBoard().getId(), new Object[]{});
 		
 		logger.info("== post create total {} and lastid {} and boardid {}" ,totalPostCnt,basebean.getId(),basebean.getBoard().getId());
 		
 		dao.createQuery("update Board b "
-				+ " set b.lastThread.id = :lastThreadId, b.lastReply.id = null, threadCount = :postCount where b.id = :boardId ")
-				.setParameter("lastThreadId", basebean.getId())
+				+ " set b.lastPost.id = :lastPostId, b.lastReply.id = null, postCount = :postCount where b.id = :boardId ")
+				.setParameter("lastPostId", basebean.getId())
 				.setParameter("postCount", totalPostCnt)
 				.setParameter("boardId", basebean.getBoard().getId())
 				.executeUpdate();
+		redisTemplate.opsForZSet().add(POSTS_KEY,basebean.getId(),basebean.getDateCreated().getTime());
+		contentTemplate.opsForHash().put(POSTS_LIST, basebean.getId()+"", basebean);
 		return ErrCodeBase.ERR_SUC;
 	}
 	
-	public Posts deleteAndLast(Posts basebean) {
+	public Post deleteAndLast(Post basebean) {
 		dao.delete(basebean);
 		//get last post and return
-		Posts lastpost = (Posts) dao.createQuery("from Posts p where p.board.id = :boardid order by p.id desc")/*where p.id < :lastid */
+		Post lastpost = (Post) dao.createQuery("from Post p where p.board.id = :boardid order by p.id desc")/*where p.id < :lastid */
 				.setParameter("boardid", basebean.getBoard().getId()).setMaxResults(1).uniqueResult();
 		return lastpost;
 	}

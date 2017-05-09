@@ -24,7 +24,7 @@ public class ReplyService extends BaseService<Reply> {
 	}
 	
 	public Reply getLastReply(int postid) {
-		Query query = dao.createQuery("from Reply r where r.thread.id = :postid order by r.id desc");
+		Query query = dao.createQuery("from Reply r where r.post.id = :postid order by r.id desc");
 		if (query == null) {
 			logger.warn("==reply create query null");
 			return null;
