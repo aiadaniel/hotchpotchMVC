@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -25,6 +27,8 @@ public class PostService extends BaseService<Post> {
 	
 	private static final String POSTS_LIST = "allposts";
 	private static final String POSTS_KEY = "allposts_id";
+	@SuppressWarnings("unused")
+	private static final String CACHE_LIST = "postlist";
 	
 	private final Logger logger = LoggerFactory.getLogger(PostService.class);
 
@@ -61,6 +65,7 @@ public class PostService extends BaseService<Post> {
 	 * 
 	 * TODO: 另外如果以zset存储postid(member)-timestamp(score)的数据，ts需要完全不重复，如何做，特别是并发时ts可能一样的
 	 */
+	//@Cacheable(value=CACHE_LIST,key="#hql")
 	public List<Post> list(String hql,int lastid,int pagesize) {
 //		ListOperations<String, Posts> listOperations = redisTemplate.opsForList();
 //		if (listOperations.size(POSTS_LIST)==0) {
@@ -111,6 +116,7 @@ public class PostService extends BaseService<Post> {
 	 * we need to update redis cache too
 	 */
 	@Override
+	//@CacheEvict//每次都清除整个list，对性能是有影响的，需要扩展cache注解，对list的操作只增删改！！！ 	MethodInteceptor
 	public void saveOrUpdate(Post basebean) {
 		super.saveOrUpdate(basebean);
 		HashOperations<String, String, Post> hashOperations = contentTemplate.opsForHash();

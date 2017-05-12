@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ import com.weeds.domain.PlatformUser;
 //@PropertySource("file:${appProperties}")
 public class UserService<T extends BaseBean> extends BaseService<T> {
 	
-	private static final String CACHE_NAME = "lists_PlatformUser";
+	private static final String CACHE_NAME = "userlist";
 	
 	private final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
@@ -65,9 +66,9 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 	}
 	
 	@Override
-	@CacheEvict(cacheNames=CACHE_NAME,key="'lists_PlatformUser'")
+	@CacheEvict(cacheNames=CACHE_NAME,key="'users'",beforeInvocation=true)//从业务层面看，删除用户不应该经常发生，可以做黑名单效果
 	public void delete(T basebean) {
-		super.delete(basebean);
+		super.delete(basebean);//TODO:需要级联删除帖子等信息才能成功
 	}
 	
 	@Override
@@ -75,7 +76,7 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 	 * NOTE: 另外这样操作，在压测list接口时，同时在swagger ui操作删除某用户，压测时间明显增加，
 	 * 所以这种方式在增删改多的时候，应该没有起到缓存效果！！！
 	 */
-//	@Cacheable(cacheNames=CACHE_NAME,key="'lists_PlatformUser'")
+	@Cacheable(cacheNames=CACHE_NAME,key="'users'")
 	public java.util.List<T> list(String sql) {
 		return super.list(sql);
 	};
