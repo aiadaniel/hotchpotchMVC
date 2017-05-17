@@ -25,8 +25,8 @@ import com.weeds.domain.Post;
 @Service
 public class PostService extends BaseService<Post> {
 	
-	private static final String POSTS_LIST = "allposts";
-	private static final String POSTS_KEY = "allposts_id";
+	private static final String POSTS_LIST = "allposts_";
+	private static final String POSTS_KEY = "allposts_id_";
 	@SuppressWarnings("unused")
 	private static final String CACHE_LIST = "postlist";
 	
@@ -43,6 +43,14 @@ public class PostService extends BaseService<Post> {
 	
 	@Autowired
 	protected RedisTemplate<String, Post> contentTemplate;
+	
+	private String getZKey(int boardid) {
+		return POSTS_KEY+boardid;
+	}
+	
+	private String getHKey(int boardid) {
+		return POSTS_LIST+boardid;
+	}
 	
 	/*
 	 * TODO: 需要对sql做分页吧，比如每页5000条，否则会不会内存爆掉
@@ -66,50 +74,50 @@ public class PostService extends BaseService<Post> {
 	 * TODO: 另外如果以zset存储postid(member)-timestamp(score)的数据，ts需要完全不重复，如何做，特别是并发时ts可能一样的
 	 */
 	//@Cacheable(value=CACHE_LIST,key="#hql")
-	public List<Post> list(String hql,int lastid,int pagesize) {
-//		ListOperations<String, Posts> listOperations = redisTemplate.opsForList();
-//		if (listOperations.size(POSTS_LIST)==0) {
-//			List<Posts> res = super.list(hql);
-//			listOperations.rightPushAll(POSTS_LIST, res);
-//		} else {
-//			
-//			listOperations.range(POSTS_LIST, lastid, lastid + pagesize);//err: lastid is not index
-//		}
-		
+	public List<Post> list(String hql,int boardid,int page,String lastid,int pagesize) {
+		//sorted set: 	key value score => key id ts
+		//hash: 		key field value => key "id" post
 		ArrayList<Post> result = new ArrayList<Post>();
-		ZSetOperations<String, Integer> operations = redisTemplate.opsForZSet();
+		ZSetOperations<String, Integer> zoperations = redisTemplate.opsForZSet();
+		String zkey = getZKey(boardid);
 		HashOperations<String, String, Post> hashOperations = contentTemplate.opsForHash();
-		if (operations.size(POSTS_KEY) == 0) {//TODO:we need a time to populate data
-			List<Post> res = super.list(hql);
+		String hkey = getHKey(boardid);
+		if (zoperations.size(zkey) <= pagesize) {//TODO:we need a time to populate data
+			List<Post> res = super.list(hql);//currently will get all data from db
 			for (int i = 0; i < res.size(); i++) {
 				Post posts = res.get(i);
-				operations.add(POSTS_KEY, posts.getId(),posts.getDateCreated().getTime());
-				hashOperations.put(POSTS_LIST, posts.getId()+"", posts); 
+				zoperations.add(zkey, posts.getId(),posts.getDateCreated().getTime());//TODO:如果score一样会覆盖旧数据。。。
+				hashOperations.put(hkey, posts.getId()+"", posts); 
 			}
-		} else {
-			//set => list
+		}
+		
+		{
 			//Range range = new Range();
-			Long lastindex = null;
-			if (lastid == 0) {
-				lastindex = Long.valueOf(0);
-			} else {
-				//Posts lastPosts = dao.find(Posts.class, lastid);
-				//logger.info("==lastpost {} & index is {}",lastPosts.getId(),operations.reverseRank(POSTS_LIST, lastPosts));
-				lastindex = operations.reverseRank(POSTS_KEY, lastid)+1;//TODO: fix lastid not exist issue
+			Long lastindex = Long.valueOf(page*pagesize);
+
+			//add find lastid to deal with post crud issue
+			if (lastid != null && !"{lastid}".equals(lastid)) {
+				Long invereindex = zoperations.reverseRank(zkey, lastid);
+				if (invereindex != null) {
+					lastindex = invereindex+1;
+				} else {
+					logger.info("==lastid {} has been removed from this cache",lastid);
+					
+				}
 			}
-			Set<Integer> posts = operations.reverseRange(POSTS_KEY, lastindex, lastindex+pagesize-1);
+			
+			Set<Integer> posts = zoperations.reverseRange(zkey, lastindex, lastindex+pagesize-1);
 			if (posts != null) {
 				Iterator<Integer> iterator = posts.iterator();
 				while (iterator.hasNext()) {
 					Integer id = iterator.next();
-					result.add(hashOperations.get(POSTS_LIST, id+""));
+					result.add(hashOperations.get(hkey, id+""));
 				}
 				return result;
 			}
 		}
 		
-		
-		return super.list(hql);
+		return result;
 	}
 	
 	/*
@@ -120,7 +128,7 @@ public class PostService extends BaseService<Post> {
 	public void saveOrUpdate(Post basebean) {
 		super.saveOrUpdate(basebean);
 		HashOperations<String, String, Post> hashOperations = contentTemplate.opsForHash();
-		hashOperations.put(POSTS_LIST, basebean.getId()+"", basebean);
+		hashOperations.put(getHKey(basebean.getBoard().getId()), basebean.getId()+"", basebean);
 	};
 	
 	@Override
@@ -139,8 +147,8 @@ public class PostService extends BaseService<Post> {
 				.setParameter("postCount", totalPostCnt)
 				.setParameter("boardId", basebean.getBoard().getId())
 				.executeUpdate();
-		redisTemplate.opsForZSet().add(POSTS_KEY,basebean.getId(),basebean.getDateCreated().getTime());
-		contentTemplate.opsForHash().put(POSTS_LIST, basebean.getId()+"", basebean);
+		redisTemplate.opsForZSet().add(getZKey(basebean.getBoard().getId()),basebean.getId(),basebean.getDateCreated().getTime());
+		contentTemplate.opsForHash().put(getHKey(basebean.getBoard().getId()), basebean.getId()+"", basebean);
 		return ErrCodeBase.ERR_SUC;
 	}
 	

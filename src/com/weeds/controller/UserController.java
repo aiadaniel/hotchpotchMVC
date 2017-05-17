@@ -9,6 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -169,6 +171,17 @@ public class UserController {
 	public ResponseEntity<?> uploadUserAvartar(@ApiParam(required=true,name="uid") @PathVariable int uid,
 			@RequestParam("file") MultipartFile file,
 			HttpServletRequest request) {
+		String subfix = ".+(.JPEG|.jpeg|.JPG|.jpg|.GIF|.gif|.BMP|.bmp|.PNG|.png)$";
+		if (file != null) {
+			Pattern pattern = Pattern.compile(subfix);
+			Matcher matcher = pattern.matcher(file.getOriginalFilename());
+			if (!matcher.matches()) {
+				return new ResponseEntity<>(ResultModel.error(ResultStatus.FILE_NOTSUPPORT),HttpStatus.OK);
+			}
+			
+			logger.info("filename {} originname {} contenttype {}",
+					file.getName(),file.getOriginalFilename(),file.getContentType());//contentType: image/png
+		}
 		userService.uploadImg(uid, file, request);
 		return new ResponseEntity<>(ResultModel.ok(),HttpStatus.OK);
 	}

@@ -40,13 +40,14 @@ public class PostController {
 	@Autowired
 	IService<PlatformUser> userService;
 	
-	@GetMapping("/list/{boardid}/{index}")
+	@GetMapping("/list/{boardid}/{page}/{lastid}")
 	@ApiOperation(value="列出帖子",notes="列出板块下的所有帖子")
 	public List<Post> list(@ApiParam(required=false,name="boardid",value="板块id，未填时列出全部帖子") @PathVariable int boardid,
-			@ApiParam(required=true,name="index",value="上次列表的最后id，主要用于分页") @PathVariable int index) {
-		logger.debug("==list post board id {} index {}",boardid,index);
+			@ApiParam(required=true,name="page",value="页码，主要用于分页") @PathVariable int page,
+			@ApiParam(required=false,name="lastid",value="上次请求的最后帖子id") @PathVariable String lastid) {
+		logger.info("==list post board id {} page {} lastid {}",boardid,page,lastid);
 		if (boardid > 0) {
-			return postService.list("from Post p where p.board.id = " + boardid + "  order by p.dateCreated desc ",index,10);
+			return postService.list("from Post p where p.board.id = " + boardid + "  order by p.dateCreated asc ",boardid,page,lastid,10);
 		}
 		return postService.list("from Post");
 	}

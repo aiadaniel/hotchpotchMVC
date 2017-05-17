@@ -76,7 +76,7 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 	 * NOTE: 另外这样操作，在压测list接口时，同时在swagger ui操作删除某用户，压测时间明显增加，
 	 * 所以这种方式在增删改多的时候，应该没有起到缓存效果！！！
 	 */
-	@Cacheable(cacheNames=CACHE_NAME,key="'users'")
+	//@Cacheable(cacheNames=CACHE_NAME,key="'users'")
 	public java.util.List<T> list(String sql) {
 		return super.list(sql);
 	};
@@ -139,13 +139,13 @@ public class UserService<T extends BaseBean> extends BaseService<T> {
 			if (!file.isEmpty()) {
 				try {
 
-					String rootPath = request.getServletContext().getRealPath("/");
+					String rootPath = request.getServletContext().getRealPath("/");//like E:\apache-tomcat-7.0.62\webapps\hotchpotchMVC\
 
 					String relativePath = env.getProperty("image.file.upload.dir");//这种方式取不到值，跟装配顺序有关吗？
 					logger.info("== env upload dir: {} and uploaddir: {} ",relativePath,uploadDir);
 					relativePath = uploadDir;//TODO: 
 
-					File dir = new File(rootPath + File.separator + relativePath);
+					File dir = new File(/*rootPath + File.separator + */relativePath);
 					if (!dir.exists())
 						dir.mkdirs();
 					String fileExtension = getFileExtension(file);
