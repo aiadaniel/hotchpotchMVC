@@ -47,7 +47,7 @@ public class ReplyController {
 	@GetMapping("/list/{postid}")
 	@ApiOperation(value="列出回复",notes="列出帖子下的所有回复")
 	public List<Reply> list(@ApiParam(required=true,name="postid",value="帖子id") @PathVariable int postid) {
-		logger.debug("==list post id {}",postid);
+		logger.info("==list post id {}",postid);
 		if (postid > 0) {
 			return replyService.list("from Reply r where r.post.id = " + postid);
 		}

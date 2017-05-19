@@ -75,15 +75,15 @@ public class UserController {
 		long res = userService.userRegist(user);
 		if (res > 0) {
 			TokenModel model = basicTokenMgr.createToken(res);
-			return new ResponseEntity<>(model, HttpStatus.OK);
+			return new ResponseEntity<>(ResultModel.ok(model.getUid()+"_"+model.getToken()), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		
 	}
 	
 	/*
-	 * TODO: use token for login
-	 * 另外登录成功后，怎样跟session结合？
+	 * 另外登录成功后，怎样跟session结合:使用token即可
+	 * TODO: 修改返回个人信息，方便客户端处理
 	 */
 	@PostMapping(path="/login/{nickname}/{password}"/*,params="myparam=1"*/)
 	@ApiOperation(value="没有token时的登录")
@@ -102,7 +102,7 @@ public class UserController {
 //				session.setAttribute(Constant.SESS_CURRENTUSER, user);
 				//session.setMaxInactiveInterval(10);//secs
 				
-				String auth = model.getUid()+"_"+model.getToken();
+				String auth = model.getUid()+"_"+model.getToken()+"_"+user.getAvatar();
 				return new ResponseEntity<>(ResultModel.ok(auth),HttpStatus.OK);
 			}
 		} catch (NoSuchAlgorithmException e) {

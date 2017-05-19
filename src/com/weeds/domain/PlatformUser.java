@@ -67,6 +67,8 @@ public class PlatformUser extends BaseBean {
 
 	@JsonIgnore
 	private String ipLastActived;
+	
+	private int integration;//积分
 
 	/*
 	 * ALL时测试删除用户，其关联的板块也被全部删除
@@ -179,6 +181,14 @@ public class PlatformUser extends BaseBean {
 
 	public void setBoardsAdministrated(Set<Board> boardsAdministrated) {
 		this.boardsAdministrated = boardsAdministrated;
+	}
+	
+	public int getIntegration() {
+		return integration;
+	}
+
+	public void setIntegration(int integration) {
+		this.integration = integration;
 	}
 
 	@Override
