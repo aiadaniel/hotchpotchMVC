@@ -20,8 +20,6 @@
 	<context:component-scan base-package="com.weeds.dao" />
 	<context:component-scan base-package="com.weeds.service" />
 
-	<aop:aspectj-autoproxy proxy-target-class="true" />
-
 	<!-- for spring+hibernate transaction support -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
@@ -79,8 +77,11 @@
 		</tx:attributes>
 	</tx:advice>
 
+	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<aop:config>
+		<!-- 这是aspectJ的切点表达式语言 -->
 		<aop:pointcut id="bussinessService" expression="execution(* com.weeds..*.*(..))" />
+		<!-- 通知（何时）：引用切点，引用通知 -->
 		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
 	</aop:config>
 

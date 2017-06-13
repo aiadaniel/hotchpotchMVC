@@ -32,9 +32,9 @@
 		p:connection-factory-ref="connectionFactory" 
 		p:keySerializer-ref="stringRedisSerializer"
 		p:hashKeySerializer-ref="stringRedisSerializer" >
-		<property name="defaultSerializer">  
+ 		<property name="defaultSerializer">  
             <bean  class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>  
-        </property> 	
+        </property>	
 	</bean>
 
 
