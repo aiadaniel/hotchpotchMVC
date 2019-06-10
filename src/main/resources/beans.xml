@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+	<!-- spring 的自动注解，如果配置扫描包component-scan，其实可以不用这项 -->
+	<context:annotation-config />
+
+	<!-- 还可以使用 <context:exclude-filter这个方式，过滤掉需要留给mvc配置去加载的包 -->
+	<context:component-scan base-package="com.weeds.dao" />
+	<context:component-scan base-package="com.weeds.service" />
+
+	<!-- for spring+hibernate transaction support -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+				hibernate.hbm2ddl.auto=update
+				hibernate.show_sql=true
+				hibernate.format_sql=true
+				hibernate.cache.use_second_level_cache=false
+				hibernate.cache.use_query_cache=false
+				hibernate.jdbc.fetch_size=50
+				hibernate.jdbc.batch_size=50
+				hibernate.connection.autocommit=true
+				hibernate.connection.release_mode=auto
+				<!-- 创建session方式 hibernate4.x 的方式 -->
+				hibernate.current_session_context_class=org.springframework.orm.hibernate4.SpringSessionContext
+				<!-- javax.persistence.validation.mode默认情况下是auto的，就是说如果不设置的话它是会自动去你的classpath下面找一个bean-validation**包 
+					所以把它设置为none即可 -->
+				javax.persistence.validation.mode=none
+				<!-- 这项配置为了使用主键初始值，具体查网络http://www.cnblogs.com/lj95801/p/5003580.html。 -->
+				hibernate.id.new_generator_mappings=true
+			</value>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.weeds.domain</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 使用注解式声明事务支持需要 -->
+	<tx:annotation-driven transaction-manager="txManager"></tx:annotation-driven>
+
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- <bean id="hibernateTransactionAttributeSource" class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource"> 
+		<property name="properties"> <props> <prop key="*">PROPAGATION_REQUIRED</prop> 
+		</props> </property> </bean> -->
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="false" propagation="SUPPORTS" />
+			<tx:method name="find*" read-only="false" propagation="SUPPORTS" />
+			<tx:method name="create*" read-only="false" />
+			<tx:method name="save*" read-only="false" propagation="REQUIRED" />
+			<tx:method name="update*" />
+			<tx:method name="delete*" />
+			<!--<tx:method name="*"/> -->
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<aop:config>
+		<!-- 这是aspectJ的切点表达式语言 -->
+		<aop:pointcut id="bussinessService" expression="execution(* com.weeds..*.*(..))" />
+		<!-- 通知（何时）：引用切点，引用通知 -->
+		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvice" />
+	</aop:config>
+
+	<!-- 当前引入这种方式导致placeholder占位符失效，需要查下为啥 -->
+	<import resource="redis-context.xml" />
+
+	<!-- 要使用spring cache注解必须加这个在主配置文件 -->
+	<cache:annotation-driven />
+	
+	<bean id="myKeyGen" class="com.platform.utils.MyKeyGen"></bean>
+
+	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager" c:redis-operations-ref="redisTemplate">
+		<!-- <property name="defaultExpiration" value="600"></property> -->
+	</bean>
+
+
+	<!-- 开发环境 -->
+	<beans profile="dev">	
+		<context:property-placeholder
+                location="classpath*:application.properties,classpath*:/property/jdbc-dev.properties,classpath*:/property/redis-dev.properties" order="2"/>
+		
+		<!-- 注解方式使用该bean -->
+<!-- 		<bean id="config" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+			<property name="locations">
+				<list>
+					<value>/WEB-INF/application.properties</value>
+					<value>/WEB-INF/property/jdbc-dev.properties</value>
+					<value>/WEB-INF/property/redis-dev.properties</value>
+				</list>
+			</property>
+		</bean> -->
+
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+
+	<!-- 测试环境 -->
+	<beans profile="qa">
+		<context:property-placeholder location="classpath*:jdbc-qa.properties" />
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.user}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+
+	<!-- 生产环境 -->
+	<beans profile="prod">
+		<context:property-placeholder
+			location="/src/webapp/WEB-INF/application.properties,/WEB-INF/property/jdbc-prod.properties,/WEB-INF/property/redis-prod.properties" />
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+		</bean>
+	</beans>
+
+
+
+</beans>
