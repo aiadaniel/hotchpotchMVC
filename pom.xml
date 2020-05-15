@@ -57,7 +57,7 @@
         <spring.version>4.3.18.RELEASE</spring.version>
         <struts2.version>2.5.10.1</struts2.version>
         <swagger.version>2.6.0</swagger.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.11.0</jackson.version>
     </properties>
 
     <dependencies>
